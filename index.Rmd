@@ -525,7 +525,7 @@ event_data <- merge(event_data, added_plot_data, all=TRUE)
 
 ### Plot Visit Events
 
-Q: I didn't map sampleCondition since we origionally had this going to materialEntityRemarks. Since we're not doing materialSample, is this where it should still go?
+Q: I didn't map sampleCondition since we originally had this going to materialEntityRemarks. Since we're not doing materialSample, is this where it should still go?
 
 ```{r}
 NEON_plot_visit_metadata <- tick.occurrence$tck_fielddata
@@ -555,9 +555,7 @@ added_plot_visit_data <- data.frame(parentEventID = NEON_plot_visit_metadata$plo
                                     verbatimElevation = paste(NEON_plot_visit_metadata$elevation, "m", sep=""),
                                     totalAreaSampledValue = NEON_plot_visit_metadata$totalSampledArea,
                                     totalAreaSampledUnit = ifelse(
-                                      is.na(NEON_plot_visit_metadata$totalSampledArea),
-                                      NA,
-                                      "m"
+                                      is.na(NEON_plot_visit_metadata$totalSampledArea), NA, "m"
                                     ),
                                     geospatialScopeAreaValue = NA,
                                     geospatialScopeAreaUnit = NA,
