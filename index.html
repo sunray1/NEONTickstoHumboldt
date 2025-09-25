@@ -523,8 +523,7 @@ not applicable to this dataset.</p>
                                   samplingEffortValue = &quot;6, 160&quot;,
                                   samplingEffortUnit = &quot;plots per bout, meters per plot circuit&quot;,
                                   samplingPerformedBy = &quot;NEON Field Staff&quot; #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = &quot; | &quot;) and get the list of actual people, though this has orcid and emails and is quite messy
-                                )
-event_data &lt;- rbind(event_data, NEON_project_event)</code></pre>
+                                )</code></pre>
 </div>
 <div id="domain-events" class="section level3">
 <h3>Domain Events</h3>
@@ -635,8 +634,7 @@ added_domain_data &lt;- data.frame(parentEventID = &quot;NEON&quot;,
                                 samplingEffortValue = &quot;6, 160&quot;,
                                 samplingEffortUnit = &quot;plots per bout, meters per plot circuit&quot;,
                                 samplingPerformedBy = &quot;NEON Field Staff&quot; #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = &quot; | &quot;) and get the list of actual people, though this has orcid and emails and is quite messy
-                              )
-event_data &lt;- merge(event_data, added_domain_data, all=TRUE)</code></pre>
+                              )</code></pre>
 </div>
 <div id="site-events" class="section level3">
 <h3>Site Events</h3>
@@ -755,8 +753,7 @@ added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[si
                               samplingEffortValue = &quot;6, 160&quot;,
                               samplingEffortUnit = &quot;plots per bout, meters per plot circuit&quot;,
                               samplingPerformedBy = &quot;NEON Field Staff&quot; #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = &quot; | &quot;) and get the list of actual people, though this has orcid and emails and is quite messy
-                            )
-event_data &lt;- merge(event_data, added_site_data, all=TRUE)</code></pre>
+                            )</code></pre>
 </div>
 <div id="plot-events" class="section level3">
 <h3>Plot Events</h3>
@@ -865,8 +862,7 @@ added_plot_data &lt;- data.frame(parentEventID = NEON_plot_metadata$siteID,
                               samplingEffortValue = &quot;6, 160&quot;,
                               samplingEffortUnit = &quot;plots per bout, meters per plot circuit&quot;,
                               samplingPerformedBy = &quot;NEON Field Staff&quot; #Q: I could change this to get the list of actual people, though this has orcid and emails and is quite messy
-                            )
-event_data &lt;- merge(event_data, added_plot_data, all=TRUE)</code></pre>
+                            )</code></pre>
 </div>
 <div id="plot-visit-events" class="section level3">
 <h3>Plot Visit Events</h3>
@@ -983,8 +979,7 @@ added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$
                                     samplingEffortValue = &quot;6, 160&quot;,
                                     samplingEffortUnit = &quot;plots per bout, meters per plot circuit&quot;,
                                     samplingPerformedBy = NEON_plot_visit_metadata$measuredBy
-                                  )
-event_data &lt;- merge(event_data, added_plot_visit_data, all=TRUE)</code></pre>
+                                  )</code></pre>
 </div>
 <div id="merge-event-tables" class="section level3">
 <h3>Merge Event Tables</h3>
@@ -1004,7 +999,7 @@ rownames(event_data) &lt;- NULL</code></pre>
 <h3>Tick Occurrences</h3>
 </div>
 <div id="tick-pathogen-occurrences" class="section level3">
-<h3>Tick pathogen Occurrences</h3>
+<h3>Tick Pathogen Occurrences</h3>
 </div>
 </div>
 <div id="map-resource-relationship-data" class="section level2">

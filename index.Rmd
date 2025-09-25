@@ -169,7 +169,6 @@ NEON_project_event <- data.frame(parentEventID = NA, #Q: should I add namespace 
                                   samplingEffortUnit = "plots per bout, meters per plot circuit",
                                   samplingPerformedBy = "NEON Field Staff" #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = " | ") and get the list of actual people, though this has orcid and emails and is quite messy
                                 )
-event_data <- rbind(event_data, NEON_project_event)
 ```
 
 ### Domain Events
@@ -283,7 +282,6 @@ added_domain_data <- data.frame(parentEventID = "NEON",
                                 samplingEffortUnit = "plots per bout, meters per plot circuit",
                                 samplingPerformedBy = "NEON Field Staff" #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = " | ") and get the list of actual people, though this has orcid and emails and is quite messy
                               )
-event_data <- merge(event_data, added_domain_data, all=TRUE)
 ```
 
 
@@ -406,7 +404,6 @@ added_site_data <- data.frame(parentEventID = NEON_site_metadata$domain_id[site_
                               samplingEffortUnit = "plots per bout, meters per plot circuit",
                               samplingPerformedBy = "NEON Field Staff" #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = " | ") and get the list of actual people, though this has orcid and emails and is quite messy
                             )
-event_data <- merge(event_data, added_site_data, all=TRUE)
 
 ```
 
@@ -519,7 +516,6 @@ added_plot_data <- data.frame(parentEventID = NEON_plot_metadata$siteID,
                               samplingEffortUnit = "plots per bout, meters per plot circuit",
                               samplingPerformedBy = "NEON Field Staff" #Q: I could change this to get the list of actual people, though this has orcid and emails and is quite messy
                             )
-event_data <- merge(event_data, added_plot_data, all=TRUE)
 
 ```
 
@@ -639,7 +635,6 @@ added_plot_visit_data <- data.frame(parentEventID = NEON_plot_visit_metadata$plo
                                     samplingEffortUnit = "plots per bout, meters per plot circuit",
                                     samplingPerformedBy = NEON_plot_visit_metadata$measuredBy
                                   )
-event_data <- merge(event_data, added_plot_visit_data, all=TRUE)
 
 ```
 
