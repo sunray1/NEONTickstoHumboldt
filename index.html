@@ -528,7 +528,7 @@ event_data &lt;- rbind(event_data, NEON_project_event)</code></pre>
 </div>
 <div id="domain-events" class="section level3">
 <h3>Domain Events</h3>
-<pre class="r"><code>NEON_domain_metadata &lt;- read.csv(&quot;data/neon_domains.csv&quot;, stringsAsFactors = FALSE)
+<pre class="r"><code>NEON_domain_metadata &lt;- read.csv(&quot;data/neon_domain_METADATA.csv&quot;, stringsAsFactors = FALSE)
 
 NEON_domain_list &lt;- unique(tick.occurrence$tck_fielddata[, c(&quot;domainID&quot;)])
 
@@ -870,14 +870,14 @@ event_data &lt;- merge(event_data, added_plot_data, all=TRUE)</code></pre>
 </div>
 <div id="plot-visit-events" class="section level3">
 <h3>Plot Visit Events</h3>
-<p>Q: I didn’t map sampleCondition since we origionally had this going
-to materialEntityRemarks. Since we’re not doing materialSample, is this
+<p>Q: I didn’t map sampleCondition since we originally had this going to
+materialEntityRemarks. Since we’re not doing materialSample, is this
 where it should still go?</p>
 <pre class="r"><code>NEON_plot_visit_metadata &lt;- tick.occurrence$tck_fielddata
 
 added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$plotID,
                                     eventID = NEON_plot_visit_metadata$uid, #Q: This was a fabricated ID in the original mapping, I set it as uid since each event has a unique one
-                                    siteNestingDescription = &quot;One visit to a 40×40 m plot designated for tick sampling&quot;,
+                                    siteNestingDescription = &quot;One visit to a 40x40 m plot designated for tick sampling&quot;,
                                     siteCount = 1, #Q: I don&#39;t know if this should be here for this event
                                     fieldNumber = NA,
                                     verbatimSiteNames = NEON_plot_visit_metadata$plotID,
@@ -899,7 +899,9 @@ added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$
                                     maximumElevationinMeters = NEON_plot_visit_metadata$elevation + NEON_plot_visit_metadata$elevationUncertainty,
                                     verbatimElevation = paste(NEON_plot_visit_metadata$elevation, &quot;m&quot;, sep=&quot;&quot;),
                                     totalAreaSampledValue = NEON_plot_visit_metadata$totalSampledArea,
-                                    totalAreaSampledUnit = &quot;m&quot;,
+                                    totalAreaSampledUnit = ifelse(
+                                      is.na(NEON_plot_visit_metadata$totalSampledArea), NA, &quot;m&quot;
+                                    ),
                                     geospatialScopeAreaValue = NA,
                                     geospatialScopeAreaUnit = NA,
                                     sampleSizeValue = NA,
@@ -907,7 +909,7 @@ added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$
                                     footprintWKT = NA,
                                     footprintSRS = NA,
                                     isVegetationCoverReported = &quot;false&quot;,
-                                    eventDate = NEON_plot_visit_metadata$collectDate,
+                                    eventDate = paste(NEON_plot_visit_metadata$collectDate),
                                     eventTime = NA,
                                     eventDurationValue = NA,
                                     eventDurationUnit = NA,
@@ -983,6 +985,17 @@ added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$
                                     samplingPerformedBy = NEON_plot_visit_metadata$measuredBy
                                   )
 event_data &lt;- merge(event_data, added_plot_visit_data, all=TRUE)</code></pre>
+</div>
+<div id="merge-event-tables" class="section level3">
+<h3>Merge Event Tables</h3>
+<pre class="r"><code>event_data &lt;- bind_rows(
+  NEON_project_event,
+  added_domain_data,
+  added_site_data,
+  added_plot_data,
+  added_plot_visit_data
+)
+rownames(event_data) &lt;- NULL</code></pre>
 </div>
 </div>
 <div id="map-occurrence-data" class="section level2">

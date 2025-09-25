@@ -737,7 +737,7 @@ occurrence_data <- rbind(indfish_data, occurrence_data)
 
 ```
 
-### Tick pathogen Occurrences
+### Tick Pathogen Occurrences
 ```{r}
 
 ```
