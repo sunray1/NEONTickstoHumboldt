@@ -1,0 +1,771 @@
+---
+title: "Mapping NEON Tick and Tick Pathogen Data Survey Monitoring Data to Humboldt Extension"
+subtitle: "See: [Guide for publishing survey & monitoring data (GBIF Draft)](https://docs.gbif-test.org/guide-publishing-survey-data/en/)"
+author: "Chandra Earl"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+<https://github.com/sunray1/NEONTickstoHumboldt>
+
+The following code will download tick and tick pathogen data collected by the National Ecological Observatory Network (NEON). The goal is to remap the data to Darwin-Core using the Humboldt Extension. This will include vouchered specimens (Occurrence) and event ecological data (Humboldt).
+
+# Load libraries
+
+```{r message=FALSE, warning=FALSE}
+library(neonUtilities)
+library(dplyr)
+```
+
+# Download files
+
+[NEON 2025a] NEON (National Ecological Observatory Network) [1]. 2025. NEON Tick pathogen status (DP1.10092.001), RELEASE-2025. https://doi.org/10.48443/8nhe-cp13. Dataset accessed from https://data.neonscience.org/data-products/DP1.10092.001/RELEASE-2025 on xxx.
+
+[NEON 2025b] NEON (National Ecological Observatory Network) [2]. 2025. NEON Ticks sampled using drag cloths (DP1.10093.001), RELEASE-2025. https://doi.org/10.48443/6zpz-5z19. Dataset accessed from https://data.neonscience.org/data-products/DP1.10093.001/RELEASE-2025 on xxx.
+
+I have a NEON token to download data, though I've saved the data as an Rdata file so users don't have to redownload.
+
+## Get Tick and Tick Pathogen data
+
+```{r}
+if (!dir.exists("data")) {
+  dir.create("data")
+}
+
+if (!dir.exists("outputs")) {
+  dir.create("outputs")
+}
+
+if (file.exists("data/tick.pathogen.RData")) {
+  load("data/tick.pathogen.RData")
+} else {
+  
+  tick.pathogen <- loadByProduct(dpID="DP1.10092.001", 
+                                 package = "basic",
+                                 release = "RELEASE-2025",
+                                 token = Sys.getenv("NEON_TOKEN"),
+                                 check.size = F)
+  
+  save(tick.pathogen, file = "data/tick.pathogen.RData")
+}
+
+if (file.exists("data/tick.occurrence.RData")) {
+  load("data/tick.occurrence.RData")
+} else {
+  
+  tick.occurrence <- loadByProduct(dpID="DP1.10093.001", 
+                                   package = "basic",
+                                   release = "RELEASE-2025",
+                                   token = Sys.getenv("NEON_TOKEN"),
+                                   check.size = F)
+  
+  save(tick.occurrence, file = "data/tick.occurrence.RData")
+}
+
+```
+
+# Map Data
+
+## Create Empty Data Frames
+
+```{r}
+event_data <- data.frame(matrix(ncol = 0, nrow = 0))
+occurrence_data <- data.frame(matrix(ncol = 0, nrow = 0))
+emof_data <- data.frame(matrix(ncol = 0, nrow = 0))
+resourceRelationship_data <- data.frame(matrix(ncol = 0, nrow = 0))
+```
+
+## Map Event Data
+
+Some event data is not included in the NEON data download (data for the project, domain and site). 
+
+All fields from the [Survey event table template](https://github.com/gbif/doc-guide-publishing-survey-data/tree/1.1_postCommReview/data/event_template_wHE_event-table.csv) are included for completeness, even if some are not applicable to this dataset. 
+
+### Project Event
+
+```{r}
+NEON_project_event <- data.frame(parentEventID = NA, #Q: should I add namespace to these terms?
+                                  eventID = "NEON",
+                                  siteNestingDescription = "46 terrestrial sites each with at least six 40×40 m plots designated for tick sampling (plots may be decommissioned and reassigned as necessary, but six plots are required for sampling) located across 19 ecoclimatic domains",
+                                  siteCount = length(unique(tick.occurrence$tck_fielddata$plotID)),
+                                  fieldNumber = NA,
+                                  verbatimSiteNames = paste(sort(unique(tick.occurrence$tck_fielddata$plotID)), collapse = " | "),
+                                  habitat = NA,
+                                  verbatimSiteDescriptions = NA,
+                                  reportedWeather = NA,
+                                  reportedExtremeConditions = NA,
+                                  locationID = NA,
+                                  countryCode = "US",
+                                  decimalLatitude = NA,
+                                  decimalLongitude = NA,
+                                  coordinateUncertaintyInMeters = NA,
+                                  geodeticDatum = NA,
+                                  locality = NA,
+                                  totalAreaSampledValue = length(unique(tick.occurrence$tck_fielddata$plotID)) * 40 * 4, #summed value of plot perimeters
+                                  totalAreaSampledUnit = "m",
+                                  geospatialScopeAreaValue = 9428288, #full geographic extent of USA-NEON boundaries
+                                  geospatialScopeAreaUnit = "km²",
+                                  sampleSizeValue = NA,
+                                  sampleSizeUnit = NA,
+                                  footprintWKT = NA,
+                                  footprintSRS = NA,
+                                  isVegetationCoverReported = "false",
+                                  eventDate = paste(
+                                    min(tick.occurrence$tck_fielddata$collectDate, na.rm = TRUE),
+                                    max(tick.occurrence$tck_fielddata$collectDate, na.rm = TRUE),
+                                    sep = "/"
+                                  ),
+                                  eventTime = NA,
+                                  eventDurationValue = NA,
+                                  eventDurationUnit = NA,
+                                  eventType = "project",
+                                  inventoryTypes = NA, #Q: I guess we could consider this an inventory and fill out this and the following, though the guide says only if eventType = Inventory
+                                  compilationTypes = NA,
+                                  compilationSourceTypes = NA,
+                                  samplingProtocol = "Drag sampling | Flagging",
+                                  protocolNames = "Drag sampling | Flagging",
+                                  protocolDescriptions = "Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.",
+                                  protocolReferences = "Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).",
+                                  isAbsenceReported = "true", #Q: Should this be reported true at this level or only at the event visit level?
+                                  absentTaxa = NA,
+                                  isAbundanceReported = "true",
+                                  isAbundanceCapReported = "false",
+                                  abundanceCap = NA,
+                                  hasMaterialSamples = "true", #Q: Since we're not explicitly designating these as material samples, should this be false?
+                                  materialSampleTypes = "wholeOrganism",
+                                  hasVouchers = "true",
+                                  voucherInstitutions = "US National Tick Collection, Georgia Southern University",
+                                  isLeastSpecificTargetCategoryQuantityInclusive = "false",
+                                  dataGeneralizations = NA,
+                                  informationWithheld = NA, #TODO: double check this - I don't think any tick taxa are withheld but I'm not 100% certain
+                                  fieldNotes = NA,
+                                  eventRemarks = NA,
+                                  verbatimTargetScope = "ticks",
+                                  targetTaxonomicScope = "?Ixodidae", #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm
+                                  excludedTaxonomicScope = NA,
+                                  isTaxonomicScopeFullyReported = "true",
+                                  taxonCompletenessReported = "reportedComplete", #Q: I'm not 100% sure I did these two correctly
+                                  taxonCompletenessProtocols = "Tick drag/flag methods are standardized to comprehensively detect all life stages of Ixodidae during the active season.", #Q: I'm not 100% sure I did these two correctly
+                                  hasNonTargetTaxa = "false",
+                                  areNonTargetTaxaFullyReported = NA,
+                                  nonTargetTaxa = NA,
+                                  identifiedBy = paste(unique(tick.occurrence$tck_taxonomyProcessed$laboratoryName), collapse = " | "), #Q: I could change this to paste(unique(tick.occurrence$tck_taxonomyProcessed$identifiedBy), collapse = " | ") and get the actual list of people who did the identifications, though this is not clean
+                                  targetLifeStageScope = "adult | nymph | larvae",
+                                  excludedLifeStageScope = "egg",
+                                  isLifeStageScopeFullyReported = "true",
+                                  targetDegreeOfEstablishmentScope = NA,
+                                  excludedDegreeOfEstablishmentScope = NA,
+                                  isDegreeOfEstablishmentScopeFullyReported = NA,
+                                  targetGrowthFormScope = NA,
+                                  excludedGrowthFormScope = NA,
+                                  isGrowthFormScopeFullyReported = NA,
+                                  hasNonTargetOrganisms = NA,
+                                  targetHabitatScope = NA,
+                                  excludedHabitatScope = NA,
+                                  samplingEffort = "6 plots per bout, 160 m perimeter sampled per plot",
+                                  isSamplingEffortReported = "true",
+                                  samplingEffortProtocol = "Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.",
+                                  samplingEffortValue = "6, 160",
+                                  samplingEffortUnit = "plots per bout, meters per plot circuit",
+                                  samplingPerformedBy = "NEON Field Staff" #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = " | ") and get the list of actual people, though this has orcid and emails and is quite messy
+                                )
+event_data <- rbind(event_data, NEON_project_event)
+```
+
+### Domain Events
+
+```{r}
+NEON_domain_metadata <- read.csv("data/neon_domain_METADATA.csv", stringsAsFactors = FALSE)
+
+NEON_domain_list <- unique(tick.occurrence$tck_fielddata[, c("domainID")])
+
+#index
+domain_idx <- match(NEON_domain_list, NEON_domain_metadata$domain_id)
+
+added_domain_data <- data.frame(parentEventID = "NEON",
+                                eventID = NEON_domain_metadata$domain_id[domain_idx],
+                                siteNestingDescription = "Each domain contains 1-3 terrestrial field sites, each with at least six 40×40 m plots designated for tick sampling (plots may be decommissioned and reassigned as necessary, but six plots are required for sampling)",
+                                siteCount = tapply(tick.occurrence$tck_fielddata$plotID,    #Get number of sampled plots per domain
+                                                   tick.occurrence$tck_fielddata$domainID,
+                                                   function(x) length(unique(x)))[NEON_domain_list],
+                                fieldNumber = NA,
+                                verbatimSiteNames = tapply(tick.occurrence$tck_fielddata$plotID,     #Get list of sampled plots at each domain
+                                                           tick.occurrence$tck_fielddata$domainID,
+                                                           function(x) paste(sort(unique(x)), collapse = " | ")
+                                                         )[NEON_domain_list],
+                                habitat = NA,
+                                verbatimSiteDescriptions = NA,
+                                reportedWeather = NA,
+                                reportedExtremeConditions = NA,
+                                locationID = NEON_domain_metadata$domain_id[domain_idx],
+                                countryCode = "US",
+                                decimalLatitude = NEON_domain_metadata$decimalLatitude[domain_idx],
+                                decimalLongitude = NEON_domain_metadata$decimalLongitude[domain_idx],
+                                coordinateUncertaintyInMeters = NEON_domain_metadata$coordinateUncertaintyinMeters[domain_idx],
+                                geodeticDatum = "WGS84",
+                                locality = paste(NEON_domain_metadata$domain_name[domain_idx], " (", NEON_domain_metadata$domain_id[domain_idx], ")", sep = ""),
+                                totalAreaSampledValue = tapply(tick.occurrence$tck_fielddata$plotID, #summed value of surveyed plot perimeters in domain
+                                                               tick.occurrence$tck_fielddata$domainID,
+                                                               function(x) length(unique(x)))[NEON_domain_list] * 40 * 4,
+                                totalAreaSampledUnit = "m",
+                                geospatialScopeAreaValue = NEON_domain_metadata$sq_km[domain_idx],
+                                geospatialScopeAreaUnit = "km²",
+                                sampleSizeValue = NA,
+                                sampleSizeUnit = NA,
+                                footprintWKT = NA, #Q: I'm not going to bother with these since they'll be huge
+                                footprintSRS = NA,
+                                isVegetationCoverReported = "false",
+                                eventDate = tapply(
+                                  tick.occurrence$tck_fielddata$collectDate,
+                                  tick.occurrence$tck_fielddata$domainID,
+                                  function(x) paste(min(x, na.rm = TRUE), max(x, na.rm = TRUE), sep = "/")
+                                )[NEON_domain_list],
+                                eventTime = NA,
+                                eventDurationValue = NA,
+                                eventDurationUnit = NA,
+                                eventType = "domain",
+                                inventoryTypes = NA,
+                                compilationTypes = NA,
+                                compilationSourceTypes = NA,
+                                samplingProtocol = "Drag sampling | Flagging", #Sampling protocol terms should be populated for every Event regardless of hierarchical level Q: I took this to mean all the terms described in 5.5. Methodology or sampling protocol (from here up to eventRemarks), or is this just for the four protocol fields?
+                                protocolNames = "Drag sampling | Flagging",
+                                protocolDescriptions = "Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.",
+                                protocolReferences = "Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).",
+                                isAbsenceReported = "true", #Q: Should this be reported true at this level or only at the event visit level?
+                                absentTaxa = NA,
+                                isAbundanceReported = "true",
+                                isAbundanceCapReported = "false",
+                                abundanceCap = NA,
+                                hasMaterialSamples = "true", #Q: Since we're not explicitly designating these as material samples, should this be false?
+                                materialSampleTypes = "wholeOrganism",
+                                hasVouchers = "true",
+                                voucherInstitutions = "US National Tick Collection, Georgia Southern University",
+                                isLeastSpecificTargetCategoryQuantityInclusive = "false",
+                                dataGeneralizations = NA,
+                                informationWithheld = NA, #TODO: double check this - I don't think any tick taxa are withheld but I'm not 100% certain
+                                fieldNotes = NA,
+                                eventRemarks = NA,
+                                verbatimTargetScope = "ticks", # Recommended best practice is to populate scope terms every Event to which they apply.
+                                targetTaxonomicScope = "?Ixodidae", #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm
+                                excludedTaxonomicScope = NA,
+                                isTaxonomicScopeFullyReported = "true",
+                                taxonCompletenessReported = "reportedComplete", #Q: I'm not 100% sure I did these two correctly
+                                taxonCompletenessProtocols = "Tick drag/flag methods are standardized to comprehensively detect all life stages of Ixodidae during the active season.", #Q: I'm not 100% sure I did these two correctly
+                                hasNonTargetTaxa = "false",
+                                areNonTargetTaxaFullyReported = NA,
+                                nonTargetTaxa = NA,
+                                identifiedBy = tick.occurrence$tck_taxonomyProcessed %>% 
+                                  left_join(tick.occurrence$tck_fielddata %>% select(sampleID, domainID),
+                                            by = "sampleID") %>%
+                                  group_by(domainID) %>%
+                                  summarise(identifiedBy = paste(sort(unique(laboratoryName)), collapse = " | "),
+                                            .groups = "drop") %>%
+                                  right_join(data.frame(domainID = NEON_domain_list), by = "domainID") %>%
+                                  arrange(match(domainID, NEON_domain_list)) %>%
+                                  mutate(identifiedBy = ifelse(is.na(identifiedBy), NA, identifiedBy)) %>% #Q: Some domains/sites have had no ticks found, so identifiedBy is NA - should this be changed to something more descriptive, like 'No ticks found'?
+                                  pull(identifiedBy), #Q: I could change this to get the actual list of people who did the identifications, though this is not clean
+                                targetLifeStageScope = "adult | nymph | larvae",
+                                excludedLifeStageScope = "egg",
+                                isLifeStageScopeFullyReported = "true",
+                                targetDegreeOfEstablishmentScope = NA,
+                                excludedDegreeOfEstablishmentScope = NA,
+                                isDegreeOfEstablishmentScopeFullyReported = NA,
+                                targetGrowthFormScope = NA,
+                                excludedGrowthFormScope = NA,
+                                isGrowthFormScopeFullyReported = NA,
+                                hasNonTargetOrganisms = NA,
+                                targetHabitatScope = NA,
+                                excludedHabitatScope = NA,
+                                samplingEffort = "6 plots per bout, 160 m perimeter sampled per plot",
+                                isSamplingEffortReported = "true",
+                                samplingEffortProtocol = "Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.",
+                                samplingEffortValue = "6, 160",
+                                samplingEffortUnit = "plots per bout, meters per plot circuit",
+                                samplingPerformedBy = "NEON Field Staff" #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = " | ") and get the list of actual people, though this has orcid and emails and is quite messy
+                              )
+event_data <- merge(event_data, added_domain_data, all=TRUE)
+```
+
+
+### Site Events
+
+```{r}
+NEON_site_metadata <- read.csv(
+  "https://www.neonscience.org/field-sites/exports/NEON_Field_Site_Metadata_20250924",
+  stringsAsFactors = FALSE
+)
+
+NEON_site_list <- unique(tick.occurrence$tck_fielddata[, c("siteID")])
+
+#indexes
+site_idx <- match(NEON_site_list, NEON_site_metadata$site_id)
+
+added_site_data <- data.frame(parentEventID = NEON_site_metadata$domain_id[site_idx],
+                              eventID = NEON_site_metadata$site_id[site_idx],
+                              siteNestingDescription = "Each site contains at least six 40×40 m plots designated for tick sampling (plots may be decommissioned and reassigned as necessary, but six plots are required for sampling)",
+                              siteCount = tapply(tick.occurrence$tck_fielddata$plotID,    #Get number of sampled plots per site
+                                                 tick.occurrence$tck_fielddata$siteID,
+                                                 function(x) length(unique(x)))[NEON_site_list],
+                              fieldNumber = NA,
+                              verbatimSiteNames = tapply(tick.occurrence$tck_fielddata$plotID,     #Get list of sampled plots at each site
+                                                         tick.occurrence$tck_fielddata$siteID,
+                                                         function(x) paste(sort(unique(x)), collapse = " | ")
+                                                       )[NEON_site_list],
+                              habitat = NEON_site_metadata$dominant_nlcd_classes[site_idx],
+                              verbatimSiteDescriptions = NEON_site_metadata$site_type[site_idx],
+                              reportedWeather = NA,
+                              reportedExtremeConditions = NA,
+                              locationID = NEON_site_metadata$site_id[site_idx],
+                              countryCode = "US",
+                              county = NEON_site_metadata$site_county[site_idx],
+                              stateProvince = NEON_site_metadata$site_state[site_idx],
+                              decimalLatitude = NEON_site_metadata$latitude[site_idx],
+                              decimalLongitude = NEON_site_metadata$longitude[site_idx],
+                              coordinateUncertaintyInMeters = NA, #Q: I can attempt to get uncertainty for each site but we don't have it handy and I'd have to calculate it by hand
+                              geodeticDatum = "WGS84",
+                              locality = paste(NEON_site_metadata$site_name[site_idx], " (", NEON_site_metadata$site_id[site_idx], ")", sep = ""),
+                              minimumElevationInMeters = NEON_site_metadata$minimum_elevation_m[site_idx],
+                              maximumElevationInMeters = NEON_site_metadata$maximum_elevation_m[site_idx],
+                              verbatimElevation = paste(NEON_site_metadata$mean_evelation_m[site_idx], "m", sep=""),
+                              totalAreaSampledValue = tapply(tick.occurrence$tck_fielddata$plotID, #summed value of surveyed plot perimeters in site
+                                                             tick.occurrence$tck_fielddata$siteID,
+                                                             function(x) length(unique(x)))[NEON_site_list] * 40 * 4,
+                              totalAreaSampledUnit = "m",
+                              geospatialScopeAreaValue = NEON_site_metadata$terrestrial_sampling_boundary_size_km2[site_idx],
+                              geospatialScopeAreaUnit = "km²",
+                              sampleSizeValue = NA,
+                              sampleSizeUnit = NA,
+                              footprintWKT = NA, #Q: I'm not going to bother with these since they'll be huge
+                              footprintSRS = NA,
+                              isVegetationCoverReported = "false",
+                              eventDate = tapply(
+                                tick.occurrence$tck_fielddata$collectDate,
+                                tick.occurrence$tck_fielddata$siteID,
+                                function(x) paste(min(x, na.rm = TRUE), max(x, na.rm = TRUE), sep = "/")
+                              )[NEON_site_list],
+                              eventTime = NA,
+                              eventDurationValue = NA,
+                              eventDurationUnit = NA,
+                              eventType = "site", 
+                              inventoryTypes = NA,
+                              compilationTypes = NA,
+                              compilationSourceTypes = NA,
+                              samplingProtocol = "Drag sampling | Flagging", #Sampling protocol terms should be populated for every Event regardless of hierarchical level Q: I took this to mean all the terms described in 5.5. Methodology or sampling protocol (from here up to eventRemarks), or is this just for the four protocol fields?
+                              protocolNames = "Drag sampling | Flagging",
+                              protocolDescriptions = "Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.",
+                              protocolReferences = "Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).",
+                              isAbsenceReported = "true", #Q: Should this be reported true at this level or only at the event visit level?
+                              absentTaxa = NA,
+                              isAbundanceReported = "true",
+                              isAbundanceCapReported = "false",
+                              abundanceCap = NA,
+                              hasMaterialSamples = "true", #Q: Since we're not explicitly designating these as material samples, should this be false?
+                              materialSampleTypes = "wholeOrganism",
+                              hasVouchers = "true",
+                              voucherInstitutions = "US National Tick Collection, Georgia Southern University",
+                              isLeastSpecificTargetCategoryQuantityInclusive = "false",
+                              dataGeneralizations = NA,
+                              informationWithheld = NA, #TODO: double check this - I don't think any tick taxa are withheld but I'm not 100% certain
+                              fieldNotes = NA,
+                              eventRemarks = NA,
+                              verbatimTargetScope = "ticks", # Recommended best practice is to populate scope terms every Event to which they apply.
+                              targetTaxonomicScope = "?Ixodidae", #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm
+                              excludedTaxonomicScope = NA,
+                              isTaxonomicScopeFullyReported = "true",
+                              taxonCompletenessReported = "reportedComplete", #Q: I'm not 100% sure I did these two correctly
+                              taxonCompletenessProtocols = "Tick drag/flag methods are standardized to comprehensively detect all life stages of Ixodidae during the active season.", #Q: I'm not 100% sure I did these two correctly
+                              hasNonTargetTaxa = "false",
+                              areNonTargetTaxaFullyReported = NA,
+                              nonTargetTaxa = NA,
+                              identifiedBy = tick.occurrence$tck_taxonomyProcessed %>% 
+                                left_join(tick.occurrence$tck_fielddata %>% select(sampleID, siteID),
+                                          by = "sampleID") %>%
+                                group_by(siteID) %>%
+                                summarise(identifiedBy = paste(sort(unique(laboratoryName)), collapse = " | "),
+                                          .groups = "drop") %>%
+                                right_join(data.frame(siteID = NEON_site_list), by = "siteID") %>%
+                                arrange(match(siteID, NEON_site_list)) %>%
+                                mutate(identifiedBy = ifelse(is.na(identifiedBy), NA, identifiedBy)) %>% #Q: Some domains/sites have had no ticks found, so identifiedBy is NA - should this be changed to something more descriptive, like 'No ticks found'?
+                                pull(identifiedBy), #Q: I could change this to get the actual list of people who did the identifications, though this is not clean
+                              targetLifeStageScope = "adult | nymph | larvae",
+                              excludedLifeStageScope = "egg",
+                              isLifeStageScopeFullyReported = "true",
+                              targetDegreeOfEstablishmentScope = NA,
+                              excludedDegreeOfEstablishmentScope = NA,
+                              isDegreeOfEstablishmentScopeFullyReported = NA,
+                              targetGrowthFormScope = NA,
+                              excludedGrowthFormScope = NA,
+                              isGrowthFormScopeFullyReported = NA,
+                              hasNonTargetOrganisms = NA,
+                              targetHabitatScope = NA,
+                              excludedHabitatScope = NA,
+                              samplingEffort = "6 plots per bout, 160 m perimeter sampled per plot",
+                              isSamplingEffortReported = "true",
+                              samplingEffortProtocol = "Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.",
+                              samplingEffortValue = "6, 160",
+                              samplingEffortUnit = "plots per bout, meters per plot circuit",
+                              samplingPerformedBy = "NEON Field Staff" #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = " | ") and get the list of actual people, though this has orcid and emails and is quite messy
+                            )
+event_data <- merge(event_data, added_site_data, all=TRUE)
+
+```
+
+### Plot Events
+
+```{r}
+NEON_plot_metadata <- unique(tick.occurrence$tck_fielddata[, c("namedLocation",
+                                                               "siteID",
+                                                               "plotID",
+                                                               "nlcdClass",
+                                                               "decimalLatitude",
+                                                               "decimalLongitude",
+                                                               "geodeticDatum",
+                                                               "coordinateUncertainty",
+                                                               "elevation",
+                                                               "elevationUncertainty")])
+
+NEON_plot_metadata <- NEON_plot_metadata %>% #There's an issue where plot JERC_081 has two elevations, causing it to be duplicated, so we'll just remove the first one
+  distinct(namedLocation, plotID, .keep_all = TRUE)
+
+added_plot_data <- data.frame(parentEventID = NEON_plot_metadata$siteID,
+                              eventID = NEON_plot_metadata$plotID,
+                              siteNestingDescription = "One 40×40 m plot designated for tick sampling",
+                              siteCount = 1,
+                              fieldNumber = NA,
+                              verbatimSiteNames = NEON_plot_metadata$plotID,
+                              habitat = NEON_plot_metadata$nlcdClass,
+                              verbatimSiteDescriptions = NA,
+                              reportedWeather = NA,
+                              reportedExtremeConditions = NA,
+                              locationID = NEON_plot_metadata$plotID,
+                              countryCode = "US",
+                              decimalLatitude = NEON_plot_metadata$decimalLatitude,
+                              decimalLongitude = NEON_plot_metadata$decimalLongitude,
+                              coordinateUncertaintyInMeters = NEON_plot_metadata$coordinateUncertainty,
+                              geodeticDatum = "WGS84",
+                              locality = NEON_plot_metadata$plotID,
+                              minimumElevationinMeters = NEON_plot_metadata$elevation - NEON_plot_metadata$elevationUncertainty,
+                              maximumElevationinMeters = NEON_plot_metadata$elevation + NEON_plot_metadata$elevationUncertainty,
+                              verbatimElevation = paste(NEON_plot_metadata$elevation, "m", sep=""),
+                              totalAreaSampledValue = 40 * 4,
+                              totalAreaSampledUnit = "m",
+                              geospatialScopeAreaValue = 40 * 4,
+                              geospatialScopeAreaUnit = "m",
+                              sampleSizeValue = NA,
+                              sampleSizeUnit = NA,
+                              footprintWKT = NA,
+                              footprintSRS = NA,
+                              isVegetationCoverReported = "false",
+                              eventDate = tapply(
+                                tick.occurrence$tck_fielddata$collectDate,
+                                tick.occurrence$tck_fielddata$plotID,
+                                function(x) paste(min(x, na.rm = TRUE), max(x, na.rm = TRUE), sep = "/")
+                              )[NEON_plot_metadata$plotID],
+                              eventTime = NA,
+                              eventDurationValue = NA,
+                              eventDurationUnit = NA,
+                              eventType = "plot", #Q: This was 'Survey' in the mapping sheet
+                              inventoryTypes = NA,
+                              compilationTypes = NA,
+                              compilationSourceTypes = NA,
+                              samplingProtocol = "Drag sampling | Flagging", #Sampling protocol terms should be populated for every Event regardless of hierarchical level Q: I took this to mean all the terms described in 5.5. Methodology or sampling protocol (from here up to eventRemarks), or is this just for the four protocol fields?
+                              protocolNames = "Drag sampling | Flagging",
+                              protocolDescriptions = "Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.",
+                              protocolReferences = "Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).",
+                              isAbsenceReported = "true", #Q: Should this be reported true at this level or only at the event visit level?
+                              absentTaxa = NA,
+                              isAbundanceReported = "true",
+                              isAbundanceCapReported = "false",
+                              abundanceCap = NA,
+                              hasMaterialSamples = "true", #Q: Since we're not explicitly designating these as material samples, should this be false?
+                              materialSampleTypes = "wholeOrganism",
+                              hasVouchers = "true",
+                              voucherInstitutions = "US National Tick Collection, Georgia Southern University",
+                              isLeastSpecificTargetCategoryQuantityInclusive = "false",
+                              dataGeneralizations = NA,
+                              informationWithheld = NA, #TODO: double check this - I don't think any tick taxa are withheld but I'm not 100% certain
+                              fieldNotes = NA,
+                              eventRemarks = NA,
+                              verbatimTargetScope = "ticks", # Recommended best practice is to populate scope terms every Event to which they apply.
+                              targetTaxonomicScope = "?Ixodidae", #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm
+                              excludedTaxonomicScope = NA,
+                              isTaxonomicScopeFullyReported = "true",
+                              taxonCompletenessReported = "reportedComplete", #Q: I'm not 100% sure I did these two correctly
+                              taxonCompletenessProtocols = "Tick drag/flag methods are standardized to comprehensively detect all life stages of Ixodidae during the active season.", #Q: I'm not 100% sure I did these two correctly
+                              hasNonTargetTaxa = "false",
+                              areNonTargetTaxaFullyReported = NA,
+                              nonTargetTaxa = NA,
+                              identifiedBy = tapply(
+                                tick.occurrence$tck_taxonomyProcessed$laboratoryName,
+                                tick.occurrence$tck_taxonomyProcessed$plotID,
+                                function(x) paste(sort(unique(x)), collapse = " | ") #Q: Some plots have had no ticks identified, so identifiedBy is NA - should this be changed to something more descriptive, like 'No ticks found'?
+                              )[NEON_plot_metadata$plotID], #Q: I could change this to get the actual list of people who did the identifications, though this is not clean
+                              targetLifeStageScope = "adult | nymph | larvae",
+                              excludedLifeStageScope = "egg",
+                              isLifeStageScopeFullyReported = "true",
+                              targetDegreeOfEstablishmentScope = NA,
+                              excludedDegreeOfEstablishmentScope = NA,
+                              isDegreeOfEstablishmentScopeFullyReported = NA,
+                              targetGrowthFormScope = NA,
+                              excludedGrowthFormScope = NA,
+                              isGrowthFormScopeFullyReported = NA,
+                              hasNonTargetOrganisms = NA,
+                              targetHabitatScope = NA,
+                              excludedHabitatScope = NA,
+                              samplingEffort = "160 m perimeter sampled per bout",
+                              isSamplingEffortReported = "true",
+                              samplingEffortProtocol = "Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.",
+                              samplingEffortValue = "6, 160",
+                              samplingEffortUnit = "plots per bout, meters per plot circuit",
+                              samplingPerformedBy = "NEON Field Staff" #Q: I could change this to get the list of actual people, though this has orcid and emails and is quite messy
+                            )
+event_data <- merge(event_data, added_plot_data, all=TRUE)
+
+```
+
+### Plot Visit Events
+
+Q: I didn't map sampleCondition since we origionally had this going to materialEntityRemarks. Since we're not doing materialSample, is this where it should still go?
+
+```{r}
+NEON_plot_visit_metadata <- tick.occurrence$tck_fielddata
+
+added_plot_visit_data <- data.frame(parentEventID = NEON_plot_visit_metadata$plotID,
+                                    eventID = NEON_plot_visit_metadata$uid, #Q: This was a fabricated ID in the original mapping, I set it as uid since each event has a unique one
+                                    siteNestingDescription = "One visit to a 40x40 m plot designated for tick sampling",
+                                    siteCount = 1, #Q: I don't know if this should be here for this event
+                                    fieldNumber = NA,
+                                    verbatimSiteNames = NEON_plot_visit_metadata$plotID,
+                                    habitat = NEON_plot_visit_metadata$nlcdClass,
+                                    verbatimSiteDescriptions = NA,
+                                    reportedWeather = NA,
+                                    reportedExtremeConditions = ifelse(
+                                      is.na(NEON_plot_visit_metadata$samplingImpractical) | NEON_plot_visit_metadata$samplingImpractical == "OK", NA,
+                                      paste0(NEON_plot_visit_metadata$samplingImpractical, ", sampling impractical")
+                                    ),
+                                    locationID = NEON_plot_visit_metadata$namedLocation,
+                                    countryCode = "US",
+                                    decimalLatitude = NEON_plot_visit_metadata$decimalLatitude,
+                                    decimalLongitude = NEON_plot_visit_metadata$decimalLongitude,
+                                    coordinateUncertaintyInMeters = NEON_plot_visit_metadata$coordinateUncertainty,
+                                    geodeticDatum = "WGS84",
+                                    locality = NEON_plot_visit_metadata$plotID,
+                                    minimumElevationinMeters = NEON_plot_visit_metadata$elevation - NEON_plot_visit_metadata$elevationUncertainty,
+                                    maximumElevationinMeters = NEON_plot_visit_metadata$elevation + NEON_plot_visit_metadata$elevationUncertainty,
+                                    verbatimElevation = paste(NEON_plot_visit_metadata$elevation, "m", sep=""),
+                                    totalAreaSampledValue = NEON_plot_visit_metadata$totalSampledArea,
+                                    totalAreaSampledUnit = ifelse(
+                                      is.na(NEON_plot_visit_metadata$totalSampledArea),
+                                      NA,
+                                      "m"
+                                    ),
+                                    geospatialScopeAreaValue = NA,
+                                    geospatialScopeAreaUnit = NA,
+                                    sampleSizeValue = NA,
+                                    sampleSizeUnit = NA,
+                                    footprintWKT = NA,
+                                    footprintSRS = NA,
+                                    isVegetationCoverReported = "false",
+                                    eventDate = paste(NEON_plot_visit_metadata$collectDate),
+                                    eventTime = NA,
+                                    eventDurationValue = NA,
+                                    eventDurationUnit = NA,
+                                    eventType = "plot visit", #Q: This was 'Site Visit' in the mapping sheet
+                                    inventoryTypes = NA,
+                                    compilationTypes = NA,
+                                    compilationSourceTypes = NA,
+                                    samplingProtocol = NEON_plot_visit_metadata$samplingMethod, #Sampling protocol terms should be populated for every Event regardless of hierarchical level Q: I took this to mean all the terms described in 5.5. Methodology or sampling protocol (from here up to eventRemarks), or is this just for the four protocol fields?
+                                    protocolNames = NEON_plot_visit_metadata$samplingMethod,
+                                    protocolDescriptions = "Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.",
+                                    protocolReferences = paste(NEON_plot_visit_metadata$samplingProtocolVersion, "Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).", sep=" | "),
+                                    isAbsenceReported = ifelse(
+                                      is.na(NEON_plot_visit_metadata$targetTaxaPresent),
+                                      "false",
+                                      "true"
+                                    ), #Q: I only did this at the event level, not the occurrence level (i.e., there are no occurrences with occurrenceStatus = absent) - the guide says otherwise #Q: if targetTaxaPresent is NA (ie. there was no sampling done, should this be NA or false?) #Q: I think I'm getting lost on if this is an attribute of the survey event visit or the protocol
+                                    absentTaxa = ifelse(
+                                      NEON_plot_visit_metadata$targetTaxaPresent == "N", "?Ixodidae", NA #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm  #Q: If there are no absences (i.e., there were ticks found) should this be something besides NA? Should this be a list of species?
+                                    ),
+                                    isAbundanceReported = ifelse(
+                                      is.na(NEON_plot_visit_metadata$targetTaxaPresent),
+                                      "false",
+                                      "true"
+                                    ), #Q: I think I'm getting lost on if this is an attribute of the survey event visit or the protocol #Q: If no survey occurred should this be something besides NA?
+                                    isAbundanceCapReported = "false",
+                                    abundanceCap = NA,
+                                    hasMaterialSamples = "true", #Q: Since we're not explicitly designating these as material samples, should this be false?
+                                    materialSampleTypes = "wholeOrganism",
+                                    hasVouchers = "true",
+                                    voucherInstitutions = "US National Tick Collection, Georgia Southern University",
+                                    isLeastSpecificTargetCategoryQuantityInclusive = "false",
+                                    dataGeneralizations = NA,
+                                    informationWithheld = NA, #TODO: double check this - I don't think any tick taxa are withheld but I'm not 100% certain
+                                    fieldNotes = NA,
+                                    eventRemarks = NEON_plot_visit_metadata$remarks,
+                                    verbatimTargetScope = "ticks", # Recommended best practice is to populate scope terms every Event to which they apply.
+                                    targetTaxonomicScope = "?Ixodidae", #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm
+                                    excludedTaxonomicScope = NA,
+                                    isTaxonomicScopeFullyReported = "true",
+                                    taxonCompletenessReported = "reportedComplete", #Q: I'm not 100% sure I did these two correctly
+                                    taxonCompletenessProtocols = "Tick drag/flag methods are standardized to comprehensively detect all life stages of Ixodidae during the active season.", #Q: I'm not 100% sure I did these two correctly
+                                    hasNonTargetTaxa = "false",
+                                    areNonTargetTaxaFullyReported = NA,
+                                    nonTargetTaxa = NA,
+                                    identifiedBy = tick.occurrence$tck_fielddata %>% #Q: Some plots have had no ticks identified, so identifiedBy is NA - should this be changed to something more descriptive, like 'No ticks found'?
+                                      left_join(
+                                        tick.occurrence$tck_taxonomyProcessed %>%
+                                          group_by(sampleID) %>%
+                                          summarise(
+                                            identifiedBy = paste(sort(unique(identifiedBy)), collapse = " | "),
+                                            .groups = "drop"
+                                          ),
+                                        by = "sampleID"
+                                      ) %>%
+                                      pull(identifiedBy),
+                                    targetLifeStageScope = "adult | nymph | larvae",
+                                    excludedLifeStageScope = "egg",
+                                    isLifeStageScopeFullyReported = "true",
+                                    targetDegreeOfEstablishmentScope = NA,
+                                    excludedDegreeOfEstablishmentScope = NA,
+                                    isDegreeOfEstablishmentScopeFullyReported = NA,
+                                    targetGrowthFormScope = NA,
+                                    excludedGrowthFormScope = NA,
+                                    isGrowthFormScopeFullyReported = NA,
+                                    hasNonTargetOrganisms = NA,
+                                    targetHabitatScope = NA,
+                                    excludedHabitatScope = NA,
+                                    samplingEffort = "160 m perimeter sampled per bout",
+                                    isSamplingEffortReported = "true",
+                                    samplingEffortProtocol = "Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.",
+                                    samplingEffortValue = "6, 160",
+                                    samplingEffortUnit = "plots per bout, meters per plot circuit",
+                                    samplingPerformedBy = NEON_plot_visit_metadata$measuredBy
+                                  )
+event_data <- merge(event_data, added_plot_visit_data, all=TRUE)
+
+```
+
+### Merge Event Tables
+
+```{r}
+event_data <- bind_rows(
+  NEON_project_event,
+  added_domain_data,
+  added_site_data,
+  added_plot_data,
+  added_plot_visit_data
+)
+rownames(event_data) <- NULL
+```
+
+
+## Map Occurrence Data
+
+### Tick Occurrences
+
+```{r eval=FALSE, include=FALSE}
+#? what's going on with materialsample
+indfish_data <- data.frame(occurrenceID = fish.counts$fsh_perFish$uid,
+                           eventID = fish.counts$fsh_perFish$eventID,
+                           basisOfRecord = ifelse(grepl("voucher", fish.counts$fsh_perFish$sampleTypeCollected, ignore.case = TRUE),
+                                           "PreservedSpecimen",
+                                           ifelse(grepl("dna", fish.counts$fsh_perFish$sampleTypeCollected, ignore.case = TRUE),
+                                                  "MaterialSample",
+                                                  "HumanObservation")),
+                           taxonID = fish.counts$fsh_perFish$taxonID,
+                           scientificName = fish.counts$fsh_perFish$scientificName,
+                           taxonRank = fish.counts$fsh_perFish$taxonRank,
+                           identificationQualifier = fish.counts$fsh_perFish$identificationQualifier,
+                           lifeStage = fish.counts$fsh_perFish$fishLifeStage,
+                           identifiedByID = paste("https://orcid.org/", fish.counts$fsh_perFish$identifiedBy, sep=""),
+                           occurrenceRemarks = fish.counts$fsh_perFish$remarks,
+                           individualCount = 1,
+                           occurrenceStatus = 'present',
+                           otherCatalogNumbers = ifelse(!is.na(fish.counts$fsh_perFish$voucherSampleID) & !is.na(fish.counts$fsh_perFish$dnaSampleID),
+                              paste(fish.counts$fsh_perFish$voucherSampleID, fish.counts$fsh_perFish$dnaSampleID, sep = " | "),
+                              ifelse(!is.na(fish.counts$fsh_perFish$voucherSampleID),
+                                     fish.counts$fsh_perFish$voucherSampleID,
+                                     ifelse(!is.na(fish.counts$fsh_perFish$dnaSampleID),
+                                            fish.counts$fsh_perFish$dnaSampleID,
+                                            NA))),
+                           preparations = ifelse(fish.counts$fsh_perFish$sampleTypeCollected == "no sample", NA, fish.counts$fsh_perFish$sampleTypeCollected)
+                        )
+
+emof_data <- merge(data.frame(measurementID = digest_vect(fish.counts$fsh_perFish$uid, "Number of the specimen"),
+                              occurrenceID = fish.counts$fsh_perFish$uid,
+                              measurementType = "Number of the specimen",
+                              measurementValue = fish.counts$fsh_perFish$specimenNumber), 
+                   emof_data, all=TRUE)
+
+emof_data <- merge(data.frame(measurementID = digest_vect(fish.counts$fsh_perFish$uid, "Length of the specimen"),
+                              occurrenceID = fish.counts$fsh_perFish$uid,
+                              measurementType = "Length of the specimen",
+                              measurementValue = fish.counts$fsh_perFish$fishTotalLength,
+                              measurementUnit = "millimeter"), 
+                   emof_data, all=TRUE)
+
+emof_data <- merge(data.frame(measurementID = digest_vect(fish.counts$fsh_perFish$uid, "Live weight as measured in the field"),
+                              occurrenceID = fish.counts$fsh_perFish$uid,
+                              measurementType = "Live weight as measured in the field",
+                              measurementValue = fish.counts$fsh_perFish$fishWeight,
+                              measurementUnit = "gram"), 
+                   emof_data, all=TRUE)
+
+if (any(!is.na(fish.counts$fsh_perFish$delt))) {
+  emof_data <- merge(data.frame(measurementID = digest_vect(fish.counts$fsh_perFish$uid[!is.na(fish.counts$fsh_perFish$delt)], "Indication of any deformities, eroded fins, lesions/parasites, tumors"),
+                                occurrenceID = fish.counts$fsh_perFish$uid[!is.na(fish.counts$fsh_perFish$delt)],
+                                measurementType = "Indication of any deformities, eroded fins, lesions/parasites, tumors",
+                                measurementValue = fish.counts$fsh_perFish$delt[!is.na(fish.counts$fsh_perFish$delt)]), 
+                     emof_data, all = TRUE)
+}
+
+if (any(!is.na(fish.counts$fsh_perFish$efMortality))) {
+  emof_data <- merge(data.frame(measurementID = digest_vect(fish.counts$fsh_perFish$uid[!is.na(fish.counts$fsh_perFish$efMortality)], "Indication of mortality from the electrofishing equipment"),
+                                occurrenceID = fish.counts$fsh_perFish$uid[!is.na(fish.counts$fsh_perFish$efMortality)],
+                                measurementType = "Indication of mortality from the electrofishing equipment",
+                                measurementValue = fish.counts$fsh_perFish$efMortality[!is.na(fish.counts$fsh_perFish$efMortality)]), 
+                     emof_data, all = TRUE)
+}
+
+if (any(!is.na(fish.counts$fsh_perFish$efInjury))) {
+  emof_data <- merge(data.frame(measurementID = digest_vect(fish.counts$fsh_perFish$uid[!is.na(fish.counts$fsh_perFish$efInjury)], "Indication of injury from the electrofishing equipment (burn marks, bent spine, hemorrhage)"),
+                                occurrenceID = fish.counts$fsh_perFish$uid[!is.na(fish.counts$fsh_perFish$efInjury)],
+                                measurementType = "Indication of injury from the electrofishing equipment (burn marks, bent spine, hemorrhage)",
+                                measurementValue = fish.counts$fsh_perFish$efInjury[!is.na(fish.counts$fsh_perFish$efInjury)]), 
+                     emof_data, all = TRUE)
+}
+
+occurrence_data <- rbind(indfish_data, occurrence_data)
+
+```
+
+### Tick pathogen Occurrences
+```{r}
+
+```
+
+
+## Map Resource Relationship Data
+```{r}
+
+```
+
+## Map emof Data
+```{r}
+
+```
+
+
+## Map Other Data
+```{r}
+
+```
+
+
+# Save Data
+```{r}
+write.csv(event_data, "outputs/event.csv", row.names = FALSE)
+write.csv(occurrence_data, "outputs/occurrence.csv", row.names = FALSE)
+write.csv(emof_data, "outputs/extendedMeasurementOrFact.csv", row.names = FALSE)
+write.csv(resourceRelationship_data, "outputs/resourceRelationship.csv", row.names = FALSE)
+```

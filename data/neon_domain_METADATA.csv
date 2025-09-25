@@ -1,0 +1,21 @@
+domain_id,domain_name,sq_km,decimalLatitude,decimalLongitude,coordinateUncertaintyinMeters,core_terrestrial,core_aquatic,science_questions,gradient
+D01,Northeast,435750.52,42.89,-74.46,1091799.45,HARV,HOPB,Climate Change; Urbanization,Nitrogen Deposition
+D02,Mid-Atlantic,351647.28,35.95,-79.65,886557.43,SCBI,POSE,Invasive Species,Nitrogen Deposition; Invaded and Uninvaded Ecosystems
+D03,Southeast,402898.58,31,-83.46,1588076.75,OSBS,BARC; SUGG,Forest Management,Forest Management
+D04,Atlantic Neotropical,35600.06,26.24,-80.79,1948144.11,GUAN,CUPE,Agriculture; Urbanization,Agricultural use
+D05,Great Lakes,545054.75,44.96,-87.71,1100206.81,UNDE,CRAM,Forest Management,Forest Management
+D06,Prairie Peninsula,651365.40,41.19,-92.31,939615.08,KONZ,KING,Agriculture,Agricultural use
+D07,Appalachians & Cumberland Plateau,305961.51,37.62,-84.03,541175.06,ORNL,WALK,Climate Change,Nitrogen deposition
+D08,Ozarks Complex,682246.11,34.74,-91.01,879868.22,TALL,MAYF,Climate Change,Ecohydrology
+D09,Northern Plains,866826.73,45.91,-102.72,1273420.14,WOOD,PRPO,Agriculture,Agricultural use
+D10,Central Plains,453477.61,38.04,-101.67,762604.97,CPER,ARIK,Agriculture; Climate Change,Agricultural use; Dust and Nitrogen Deposition
+D11,Southern Plains,536254.65,32.02,-98.47,794489.38,CLBJ,PRIN,Invasive Species,Invaded and Uninvaded Ecosystems
+D12,Northern Rockies,326668.32,45.74,-113.33,733868.86,YELL,BLDE,Urbanization,
+D13,Southern Rockies & Colorado Plateau,643095.76,37.04,-108.66,847105.20,NIWO,COMO,Climate Change,Dust and Nitrogen Deposition
+D14,Desert Southwest,437127.82,32.35,-109.91,1103401.19,SRER,SYCA,Climate Change; Urbanization,
+D15,Great Basin,842965.49,42.47,-116.06,1274299.05,ONAQ,REDB,Urbanization,
+D16,Pacific Northwest,356299.86,60.05,-140.98,4065727.08,WREF,MART,Forest Management,Forest Management
+D17,Pacific Southwest,240942.27,37.33,-120.4,786724.30,SJER,TECR,Climate Change,Rain-snow transition zones; Dust and Nitrogen Deposition
+D18,Tundra,571903.25,69.01,-153.9,3013166.09,TOOL,OKSR,Climate Change,Permafrost
+D19,Taiga,725674.03,64.16,-150.65,2502898.22,BONA,CARI,Climate Change,Permafrost
+D20,Pacific Tropical,16528.47,19.6,-155.51,592137.37,PUUM,,Invasive Species,Invaded and Uninvaded Ecosystems
