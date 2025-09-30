@@ -11,7 +11,7 @@
 
 <meta name="author" content="Chandra Earl" />
 
-<meta name="date" content="2025-09-25" />
+<meta name="date" content="2025-09-30" />
 
 <title>Mapping NEON Tick and Tick Pathogen Data Survey Monitoring Data to Humboldt Extension</title>
 
@@ -355,7 +355,7 @@ Survey Monitoring Data to Humboldt Extension</h1>
 <h3 class="subtitle">See: <a href="https://docs.gbif-test.org/guide-publishing-survey-data/en/">Guide
 for publishing survey &amp; monitoring data (GBIF Draft)</a></h3>
 <h4 class="author">Chandra Earl</h4>
-<h4 class="date">2025-09-25</h4>
+<h4 class="date">2025-09-30</h4>
 
 </div>
 
@@ -376,12 +376,12 @@ library(dplyr)</code></pre>
 <p>[NEON 2025a] NEON (National Ecological Observatory Network) [1].
 2025. NEON Tick pathogen status (DP1.10092.001), RELEASE-2025. <a href="https://doi.org/10.48443/8nhe-cp13" class="uri">https://doi.org/10.48443/8nhe-cp13</a>. Dataset accessed
 from <a href="https://data.neonscience.org/data-products/DP1.10092.001/RELEASE-2025" class="uri">https://data.neonscience.org/data-products/DP1.10092.001/RELEASE-2025</a>
-on xxx.</p>
+on 2025-09-25.</p>
 <p>[NEON 2025b] NEON (National Ecological Observatory Network) [2].
 2025. NEON Ticks sampled using drag cloths (DP1.10093.001),
 RELEASE-2025. <a href="https://doi.org/10.48443/6zpz-5z19" class="uri">https://doi.org/10.48443/6zpz-5z19</a>. Dataset accessed
 from <a href="https://data.neonscience.org/data-products/DP1.10093.001/RELEASE-2025" class="uri">https://data.neonscience.org/data-products/DP1.10093.001/RELEASE-2025</a>
-on xxx.</p>
+on 2025-09-25.</p>
 <p>I have a NEON token to download data, though I’ve saved the data as
 an Rdata file so users don’t have to redownload.</p>
 <div id="get-tick-and-tick-pathogen-data" class="section level2">
@@ -423,13 +423,6 @@ if (file.exists(&quot;data/tick.occurrence.RData&quot;)) {
 </div>
 <div id="map-data" class="section level1">
 <h1>Map Data</h1>
-<div id="create-empty-data-frames" class="section level2">
-<h2>Create Empty Data Frames</h2>
-<pre class="r"><code>event_data &lt;- data.frame(matrix(ncol = 0, nrow = 0))
-occurrence_data &lt;- data.frame(matrix(ncol = 0, nrow = 0))
-emof_data &lt;- data.frame(matrix(ncol = 0, nrow = 0))
-resourceRelationship_data &lt;- data.frame(matrix(ncol = 0, nrow = 0))</code></pre>
-</div>
 <div id="map-event-data" class="section level2">
 <h2>Map Event Data</h2>
 <p>Some event data is not included in the NEON data download (data for
@@ -659,7 +652,7 @@ added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[si
                                                          tick.occurrence$tck_fielddata$siteID,
                                                          function(x) paste(sort(unique(x)), collapse = &quot; | &quot;)
                                                        )[NEON_site_list],
-                              habitat = NEON_site_metadata$dominant_nlcd_classes[site_idx],
+                              habitat = gsub(&quot;\\|&quot;, &quot; | &quot;, NEON_site_metadata$dominant_nlcd_classes[site_idx]),
                               verbatimSiteDescriptions = NEON_site_metadata$site_type[site_idx],
                               reportedWeather = NA,
                               reportedExtremeConditions = NA,
@@ -872,7 +865,13 @@ where it should still go?</p>
 <pre class="r"><code>NEON_plot_visit_metadata &lt;- tick.occurrence$tck_fielddata
 
 added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$plotID,
-                                    eventID = NEON_plot_visit_metadata$uid, #Q: This was a fabricated ID in the original mapping, I set it as uid since each event has a unique one
+                                    eventID = ifelse(is.na(NEON_plot_visit_metadata$sampleID), #eventID is the sampleID if a sample is taken, if not, we create one with the same format (plotID.date)
+                                                      paste0(
+                                                        NEON_plot_visit_metadata$plotID, &quot;.&quot;,
+                                                        format(as.Date(NEON_plot_visit_metadata$collectDate), &quot;%Y%m%d&quot;)
+                                                      ),
+                                                      NEON_plot_visit_metadata$sampleID
+                                                    ),
                                     siteNestingDescription = &quot;One visit to a 40x40 m plot designated for tick sampling&quot;,
                                     siteCount = 1, #Q: I don&#39;t know if this should be here for this event
                                     fieldNumber = NA,
@@ -997,9 +996,139 @@ rownames(event_data) &lt;- NULL</code></pre>
 <h2>Map Occurrence Data</h2>
 <div id="tick-occurrences" class="section level3">
 <h3>Tick Occurrences</h3>
+<pre class="r"><code>NEON_tick_occurrence_data &lt;- tick.occurrence$tck_taxonomyProcessed
+
+added_tick_occurrence_data &lt;- data.frame(eventID = NEON_tick_occurrence_data$sampleID,
+                                         occurrenceID = NEON_tick_occurrence_data$subsampleID,
+                                         basisOfRecord = &quot;PreservedSpecimen&quot;,
+                                         scientificName = NEON_tick_occurrence_data$scientificName,
+                                         scientificNameAuthorship = NEON_tick_occurrence_data$scientificNameAuthorship,
+                                         taxonRank = NEON_tick_occurrence_data$taxonRank,
+                                         kingdom = &quot;Animalia&quot;,
+                                         family = NEON_tick_occurrence_data$family,
+                                         subfamily = NEON_tick_occurrence_data$subfamily,
+                                         tribe = NEON_tick_occurrence_data$tribe,
+                                         subtribe = NEON_tick_occurrence_data$subtribe,
+                                         genus = NEON_tick_occurrence_data$genus,
+                                         subgenus = NEON_tick_occurrence_data$subgenus,
+                                         specificEpithet = NEON_tick_occurrence_data$specificEpithet,
+                                         infraspecificEpithet = NEON_tick_occurrence_data$infraspecificEpithet,
+                                         identificationQualifier = NEON_tick_occurrence_data$identificationQualifier,
+                                         identificationReferences = NEON_tick_occurrence_data$identificationReferences,
+                                         identificationRemarks = NEON_tick_occurrence_data$identificationProtocolVersion,
+                                         occurrenceStatus = &quot;present&quot;,
+                                         organismQuantity = NA, #individualCount is used instead
+                                         organismQuantityType = NA, #individualCount is used instead
+                                         individualCount = NEON_tick_occurrence_data$individualCount,
+                                         recordedByID = NA, #This information is in the plot visit event
+                                         vernacularName = c(&quot;Dermacentor variabilis&quot; = &quot;American dog tick&quot;,
+                                                            &quot;Ixodes scapularis&quot; = &quot;Blacklegged tick / Deer tick&quot;,
+                                                            &quot;Haemaphysalis leporispalustris&quot; = &quot;Rabbit tick&quot;,
+                                                            &quot;Amblyomma americanum&quot; = &quot;Lone star tick&quot;,
+                                                            &quot;Haemaphysalis longicornis&quot; = &quot;Asian longhorned tick&quot;,
+                                                            &quot;Ixodes muris&quot; = &quot;Mouse tick&quot;,
+                                                            &quot;Ixodes dentatus&quot; = &quot;Rabbit tick&quot;,
+                                                            &quot;Amblyomma maculatum&quot; = &quot;Gulf Coast tick&quot;,
+                                                            &quot;Ixodes marxi&quot; = &quot;Squirrel tick&quot;,
+                                                            &quot;Ixodes brunneus&quot; = &quot;Bird tick&quot;,
+                                                            &quot;Dermacentor andersoni&quot; = &quot;Rocky Mountain wood tick&quot;,
+                                                            &quot;Dermacentor parumapertus&quot; = &quot;Desert wood tick&quot;,
+                                                            &quot;Ixodes pacificus&quot; = &quot;Western blacklegged tick&quot;,
+                                                            &quot;Ixodes angustus&quot; = &quot;Mouse tick&quot;,
+                                                            &quot;Dermacentor occidentalis&quot; = &quot;Pacific Coast tick&quot;
+                                                          )[NEON_tick_occurrence_data$scientificName],
+                                         sex = ifelse(NEON_tick_occurrence_data$sexOrAge %in% c(&quot;Male&quot;, &quot;Female&quot;),
+                                                       NEON_tick_occurrence_data$sexOrAge,
+                                                       NA),
+                                         lifeStage = ifelse(NEON_tick_occurrence_data$sexOrAge %in% c(&quot;Male&quot;, &quot;Female&quot;),
+                                                             &quot;Adult&quot;,
+                                                             NEON_tick_occurrence_data$sexOrAge),
+                                         establishmentMeans = NA,
+                                         degreeOfEstablishment = NA,
+                                         pathway = NA,
+                                         vitality = &quot;alive&quot;,
+                                         preparations = NEON_tick_occurrence_data$archiveMedium,
+                                         institutionID = NEON_tick_occurrence_data$archiveFacilityID,
+                                         identifiedBy = paste(NEON_tick_occurrence_data$identifiedBy, NEON_tick_occurrence_data$laboratoryName, sep=&quot;, &quot;),
+                                         occurrenceRemarks = NEON_tick_occurrence_data$remarks
+                               )</code></pre>
 </div>
 <div id="tick-pathogen-occurrences" class="section level3">
 <h3>Tick Pathogen Occurrences</h3>
+<pre class="r"><code>NEON_pathogen_occurrence_data &lt;- tick.pathogen$tck_pathogen %&gt;%
+  filter(
+    !is.na(testResult) &amp;
+    !is.na(testPathogenName) &amp;
+      testPathogenName != &quot;HardTick DNA Quality&quot; &amp; #Remove DNA Quality test
+      !grepl(&quot;^(Ixodes|Dermacentor|Amblyomma|Haemaphysalis)&quot;, testPathogenName) #Remove molecular identification tests
+  )
+
+added_pathogen_occurrence_data &lt;- data.frame(eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID, &quot;\\.&quot;), 
+                                                              function(x) paste(x[1:2], collapse = &quot;.&quot;)),
+                                             occurrenceID = NEON_pathogen_occurrence_data$uid,
+                                             basisOfRecord = &quot;LaboratoryObservation&quot;,  #Q: I&#39;m not sure what to put here
+                                             scientificName = NEON_pathogen_occurrence_data$testPathogenName,
+                                             taxonRank = NA,
+                                             kingdom = c(&quot;Borrelia burgdorferi&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Borrelia miyamotoi&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Anaplasma phagocytophilum&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Rickettsia rickettsii&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Ehrlichia chaffeensis&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Borrelia lonestari&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Babesia microti&quot; = &quot;Protista&quot;,
+                                                         &quot;Ehrlichia ewingii&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Borrelia burgdorferi sensu lato&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Ehrlichia muris-like&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Borrelia mayonii&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Francisella tularensis&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Borrelia sp.&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Rickettsia parkeri&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Rickettsia philipii&quot; = &quot;Bacteria&quot;
+                                                         )[NEON_pathogen_occurrence_data$testPathogenName],
+                                             occurrenceStatus = ifelse(NEON_pathogen_occurrence_data$testResult == &quot;Negative&quot;, &quot;absent&quot;,
+                                                                       ifelse(NEON_pathogen_occurrence_data$testResult == &quot;Positive&quot;, &quot;present&quot;, NA)
+                                                                      ),
+                                             organismQuantity = NA,
+                                             organismQuantityType = NA,
+                                             individualCount = NA, #Recommend not sharing this until we find out specifically what this is actually reporting. Note: this is always 1.
+                                             recordedByID = NA, #This information is in the plot visit event
+                                             vernacularName = c(&quot;Borrelia burgdorferi&quot; = &quot;Lyme disease agent&quot;,
+                                                                &quot;Borrelia miyamotoi&quot; = &quot;Borrelia miyamotoi disease (BMD) agent&quot;,
+                                                                &quot;Anaplasma phagocytophilum&quot; = &quot;Human granulocytic anaplasmosis (HGA) agent&quot;,
+                                                                &quot;Rickettsia rickettsii&quot; = &quot;Rocky Mountain spotted fever agent&quot;,
+                                                                &quot;Ehrlichia chaffeensis&quot; = &quot;Human monocytic ehrlichiosis agent&quot;,
+                                                                &quot;Borrelia lonestari&quot; = &quot;Southern tick-associated rash illness (STARI) agent&quot;,
+                                                                &quot;Babesia microti&quot; = &quot;Babesiosis parasite&quot;,
+                                                                &quot;Ehrlichia ewingii&quot;  = &quot;Human ehrlichiosis agent&quot;,
+                                                                &quot;Borrelia burgdorferi sensu lato&quot; = &quot;Lyme disease agent&quot;,
+                                                                &quot;Ehrlichia muris-like&quot; = &quot;Human ehrlichiosis agent&quot;,
+                                                                &quot;Borrelia mayonii&quot; = &quot;Lyme disease agent&quot;,
+                                                                &quot;Francisella tularensis&quot; = &quot;Tularemia agent&quot;,
+                                                                &quot;Borrelia sp.&quot; = &quot;Lyme disease or relapsing fever agent&quot;,
+                                                                &quot;Rickettsia parkeri&quot; = &quot;Rickettsia parkeri rickettsiosis agent&quot;,
+                                                                &quot;Rickettsia philipii&quot; = &quot;Pacific coast tick fever agent&quot;
+                                                               )[NEON_pathogen_occurrence_data$testPathogenName],
+                                             sex = NA,
+                                             lifeStage = NA,
+                                             establishmentMeans = NA,
+                                             degreeOfEstablishment = NA,
+                                             pathway = NA,
+                                             vitality = NA,
+                                             identificationRemarks = paste(NEON_pathogen_occurrence_data$testProtocolVersion,
+                                                                            ifelse(is.na(NEON_pathogen_occurrence_data$remarks), &quot;&quot;, 
+                                                                                   paste(&quot;; &quot;, NEON_pathogen_occurrence_data$remarks))
+                                                                          ),
+                                             identifiedBy = paste(NEON_pathogen_occurrence_data$testedBy, NEON_pathogen_occurrence_data$laboratoryName, sep=&quot;, &quot;),
+                                             dateIdentified = NEON_pathogen_occurrence_data$testedDate,
+                                             materialSampleID = NEON_pathogen_occurrence_data$testingID, #Q: Does this need to be remapped or removed since we aren&#39;t doing materialSample?
+                                             materialEntityRemarks = &quot;materialSampleID corresponds to the NEON testingID, which uniquely identifies the individual tick nymph(s) tested.&quot;
+                                   )</code></pre>
+</div>
+<div id="merge-occurrence-tables" class="section level3">
+<h3>Merge Occurrence Tables</h3>
+<pre class="r"><code>occurrence_data &lt;- bind_rows(added_tick_occurrence_data,
+                             added_pathogen_occurrence_data)
+rownames(occurrence_data) &lt;- NULL</code></pre>
 </div>
 </div>
 <div id="map-resource-relationship-data" class="section level2">
@@ -1016,8 +1145,8 @@ rownames(event_data) &lt;- NULL</code></pre>
 <h1>Save Data</h1>
 <pre class="r"><code>write.csv(event_data, &quot;outputs/event.csv&quot;, row.names = FALSE)
 write.csv(occurrence_data, &quot;outputs/occurrence.csv&quot;, row.names = FALSE)
-write.csv(emof_data, &quot;outputs/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)
-write.csv(resourceRelationship_data, &quot;outputs/resourceRelationship.csv&quot;, row.names = FALSE)</code></pre>
+#write.csv(emof_data, &quot;outputs/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)
+#write.csv(resourceRelationship_data, &quot;outputs/resourceRelationship.csv&quot;, row.names = FALSE)</code></pre>
 </div>
 
 
