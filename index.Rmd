@@ -404,6 +404,7 @@ added_site_data <- data.frame(parentEventID = NEON_site_metadata$domain_id[site_
 NEON_plot_metadata <- unique(tick.occurrence$tck_fielddata[, c("namedLocation",
                                                                "siteID",
                                                                "plotID",
+                                                               "plotType",
                                                                "nlcdClass",
                                                                "decimalLatitude",
                                                                "decimalLongitude",
@@ -801,22 +802,158 @@ resource_relationship_data <- data.frame(resourceID = NEON_pathogen_occurrence_d
 )
 ```
 
-## Map emof Data
-```{r}
+## Map Extended Measurement or Fact Data
 
+### Plot Type
+```{r}
+emof_plot_data <- data.frame(eventID = NEON_plot_metadata$plotID,
+                             occurrenceID = NA, # This is just for readability of the final table
+                             measurementType = "Plot Type",
+                             measurementValue = NEON_plot_metadata$plotType
+)
 ```
 
-
-## Map Other Data
+### Counts
 ```{r}
+#Q: I removed records where these are NA, should I keep those in (i.e., and have a record for each event regardless)?
+emof_counts_adult_data <- data.frame( #only create a row if adultCount is not NA
+  eventID = ifelse( 
+    is.na(NEON_plot_visit_metadata$sampleID), #eventID is the sampleID if a sample is taken, if not, we create one with the same format (plotID.date)
+    paste0(NEON_plot_visit_metadata$plotID, ".",
+           format(as.Date(NEON_plot_visit_metadata$collectDate), "%Y%m%d")
+    ),
+    NEON_plot_visit_metadata$sampleID
+  )[!is.na(NEON_plot_visit_metadata$adultCount)],
+  occurrenceID = NA, # This is just for readability of the final table
+  measurementType = "Adult Count",
+  measurementValue = as.character(NEON_plot_visit_metadata$adultCount[!is.na(NEON_plot_visit_metadata$adultCount)])
+)
 
+emof_counts_nymph_data <- data.frame( #only create a row if nymphCount is not NA
+  eventID = ifelse( 
+    is.na(NEON_plot_visit_metadata$sampleID), #eventID is the sampleID if a sample is taken, if not, we create one with the same format (plotID.date)
+    paste0(NEON_plot_visit_metadata$plotID, ".",
+           format(as.Date(NEON_plot_visit_metadata$collectDate), "%Y%m%d")
+    ),
+    NEON_plot_visit_metadata$sampleID
+  )[!is.na(NEON_plot_visit_metadata$nymphCount)],
+  occurrenceID = NA, # This is just for readability of the final table
+  measurementType = "Nymph Count",
+  measurementValue = as.character(NEON_plot_visit_metadata$nymphCount[!is.na(NEON_plot_visit_metadata$nymphCount)])
+)
+
+emof_counts_larva_data <- data.frame( #only create a row if larvaCount is not NA
+  eventID = ifelse( 
+    is.na(NEON_plot_visit_metadata$sampleID), #eventID is the sampleID if a sample is taken, if not, we create one with the same format (plotID.date)
+    paste0(NEON_plot_visit_metadata$plotID, ".",
+           format(as.Date(NEON_plot_visit_metadata$collectDate), "%Y%m%d")
+    ),
+    NEON_plot_visit_metadata$sampleID
+  )[!is.na(NEON_plot_visit_metadata$larvaCount)],
+  occurrenceID = NA, # This is just for readability of the final table
+  measurementType = "Larva Count",
+  measurementValue = as.character(NEON_plot_visit_metadata$larvaCount[!is.na(NEON_plot_visit_metadata$larvaCount)])
+)
 ```
 
+### Sample Code (Barcode)
+```{r}
+emof_sample_code_data <- data.frame( #only create a row if sampleCount is not NA
+  eventID = ifelse(
+    is.na(NEON_plot_visit_metadata$sampleID), #eventID is the sampleID if a sample is taken, if not, we create one with the same format (plotID.date)
+    paste0(NEON_plot_visit_metadata$plotID, ".",
+           format(as.Date(NEON_plot_visit_metadata$collectDate), "%Y%m%d")
+    ),
+    NEON_plot_visit_metadata$sampleID
+  )[!is.na(NEON_plot_visit_metadata$sampleCode)],
+  occurrenceID = NA, # This is just for readability of the final table
+  measurementType = "Sample Barcode",
+  measurementValue = NEON_plot_visit_metadata$sampleCode[!is.na(NEON_plot_visit_metadata$sampleCode)]
+)
+```
+
+### Tick Sample Condition
+```{r}
+emof_tick_sample_condition_data <- data.frame(eventID = NEON_tick_occurrence_data$sampleID,
+                                              occurrenceID = NEON_tick_occurrence_data$subsampleID,
+                                              measurementType = "Tick Sample Condition",
+                                              measurementValue = NEON_tick_occurrence_data$sampleCondition
+)
+```
+
+### Deprecated Vial ID
+```{r}
+emof_deprecatedVialID_data <- data.frame(eventID = NEON_tick_occurrence_data$sampleID,
+                                         occurrenceID = NEON_tick_occurrence_data$subsampleID,
+                                         measurementType = "Deprecated Vial ID",
+                                         measurementValue = NEON_tick_occurrence_data$deprecatedVialID
+)
+```
+
+### Tick Pathogen Sample Condition
+```{r}
+emof_pathogen_sample_condition_data <- data.frame(eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID, "\\."), 
+                                                                   function(x) paste(x[1:2], collapse = ".")),
+                                                  occurrenceID = NEON_pathogen_occurrence_data$uid,
+                                                  measurementType = "Tick Pathogen Sample Condition",
+                                                  measurementValue = NEON_pathogen_occurrence_data$sampleCondition
+)
+```
+
+### CQ (Quantification Cycle or Threshold Number) Value
+```{r}
+emof_cqValue_data <- data.frame(
+  eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID[!is.na(NEON_pathogen_occurrence_data$cqValue)], "\\."),
+                   function(x) paste(x[1:2], collapse = ".")),
+  occurrenceID = NEON_pathogen_occurrence_data$uid[!is.na(NEON_pathogen_occurrence_data$cqValue)],
+  measurementType = "CQ (Quantification Cycle or Threshold Number) Value",
+  measurementValue = as.character(NEON_pathogen_occurrence_data$cqValue[!is.na(NEON_pathogen_occurrence_data$cqValue)])
+)
+```
+
+### DNA Sample ID
+```{r}
+emof_dnaSampleID_data <- data.frame(
+  eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID[!is.na(NEON_pathogen_occurrence_data$dnaSampleID)], "\\."),
+                   function(x) paste(x[1:2], collapse = ".")),
+  occurrenceID = NEON_pathogen_occurrence_data$uid[!is.na(NEON_pathogen_occurrence_data$dnaSampleID)],
+  measurementType = "Identifier for DNA sample",
+  measurementValue = NEON_pathogen_occurrence_data$dnaSampleID[!is.na(NEON_pathogen_occurrence_data$dnaSampleID)]
+)
+```
+
+### DNA Sample Code
+```{r}
+emof_dnaSampleCode_data <- data.frame(
+  eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID[!is.na(NEON_pathogen_occurrence_data$dnaSampleCode)], "\\."),
+                   function(x) paste(x[1:2], collapse = ".")),
+  occurrenceID = NEON_pathogen_occurrence_data$uid[!is.na(NEON_pathogen_occurrence_data$dnaSampleCode)],
+  measurementType = "Barcode of a DNA sample",
+  measurementValue = NEON_pathogen_occurrence_data$dnaSampleCode[!is.na(NEON_pathogen_occurrence_data$dnaSampleCode)]
+)
+```
+
+### Merge Extended Measurement or Fact Tables
+```{r}
+emof_data <- bind_rows(emof_plot_data,
+                       emof_counts_adult_data,
+                       emof_counts_nymph_data,
+                       emof_counts_larva_data,
+                       emof_sample_code_data,
+                       emof_tick_sample_condition_data,
+                       emof_deprecatedVialID_data,
+                       emof_pathogen_sample_condition_data,
+                       emof_cqValue_data,
+                       emof_dnaSampleID_data,
+                       emof_dnaSampleCode_data
+                       )
+rownames(emof_data) <- NULL
+```
 
 # Save Data
 ```{r}
 write.csv(event_data, "outputs/event.csv", row.names = FALSE)
 write.csv(occurrence_data, "outputs/occurrence.csv", row.names = FALSE)
 write.csv(resource_relationship_data, "outputs/resourceRelationship.csv", row.names = FALSE)
-#write.csv(emof_data, "outputs/extendedMeasurementOrFact.csv", row.names = FALSE)
+write.csv(emof_data, "outputs/extendedMeasurementOrFact.csv", row.names = FALSE)
 ```

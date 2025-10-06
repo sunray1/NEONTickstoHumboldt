@@ -753,6 +753,7 @@ added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[si
 <pre class="r"><code>NEON_plot_metadata &lt;- unique(tick.occurrence$tck_fielddata[, c(&quot;namedLocation&quot;,
                                                                &quot;siteID&quot;,
                                                                &quot;plotID&quot;,
+                                                               &quot;plotType&quot;,
                                                                &quot;nlcdClass&quot;,
                                                                &quot;decimalLatitude&quot;,
                                                                &quot;decimalLongitude&quot;,
@@ -1138,11 +1139,144 @@ rownames(occurrence_data) &lt;- NULL</code></pre>
                                          relationshipOfResource = &quot;pathogen of&quot;
 )</code></pre>
 </div>
-<div id="map-emof-data" class="section level2">
-<h2>Map emof Data</h2>
+<div id="map-extended-measurement-or-fact-data" class="section level2">
+<h2>Map Extended Measurement or Fact Data</h2>
+<div id="plot-type" class="section level3">
+<h3>Plot Type</h3>
+<pre class="r"><code>emof_plot_data &lt;- data.frame(eventID = NEON_plot_metadata$plotID,
+                             occurrenceID = NA, # This is just for readability of the final table
+                             measurementType = &quot;Plot Type&quot;,
+                             measurementValue = NEON_plot_metadata$plotType
+)</code></pre>
 </div>
-<div id="map-other-data" class="section level2">
-<h2>Map Other Data</h2>
+<div id="counts" class="section level3">
+<h3>Counts</h3>
+<pre class="r"><code>#Q: I removed records where these are NA, should I keep those in (i.e., and have a record for each event regardless)?
+emof_counts_adult_data &lt;- data.frame( #only create a row if adultCount is not NA
+  eventID = ifelse( 
+    is.na(NEON_plot_visit_metadata$sampleID), #eventID is the sampleID if a sample is taken, if not, we create one with the same format (plotID.date)
+    paste0(NEON_plot_visit_metadata$plotID, &quot;.&quot;,
+           format(as.Date(NEON_plot_visit_metadata$collectDate), &quot;%Y%m%d&quot;)
+    ),
+    NEON_plot_visit_metadata$sampleID
+  )[!is.na(NEON_plot_visit_metadata$adultCount)],
+  occurrenceID = NA, # This is just for readability of the final table
+  measurementType = &quot;Adult Count&quot;,
+  measurementValue = as.character(NEON_plot_visit_metadata$adultCount[!is.na(NEON_plot_visit_metadata$adultCount)])
+)
+
+emof_counts_nymph_data &lt;- data.frame( #only create a row if nymphCount is not NA
+  eventID = ifelse( 
+    is.na(NEON_plot_visit_metadata$sampleID), #eventID is the sampleID if a sample is taken, if not, we create one with the same format (plotID.date)
+    paste0(NEON_plot_visit_metadata$plotID, &quot;.&quot;,
+           format(as.Date(NEON_plot_visit_metadata$collectDate), &quot;%Y%m%d&quot;)
+    ),
+    NEON_plot_visit_metadata$sampleID
+  )[!is.na(NEON_plot_visit_metadata$nymphCount)],
+  occurrenceID = NA, # This is just for readability of the final table
+  measurementType = &quot;Nymph Count&quot;,
+  measurementValue = as.character(NEON_plot_visit_metadata$nymphCount[!is.na(NEON_plot_visit_metadata$nymphCount)])
+)
+
+emof_counts_larva_data &lt;- data.frame( #only create a row if larvaCount is not NA
+  eventID = ifelse( 
+    is.na(NEON_plot_visit_metadata$sampleID), #eventID is the sampleID if a sample is taken, if not, we create one with the same format (plotID.date)
+    paste0(NEON_plot_visit_metadata$plotID, &quot;.&quot;,
+           format(as.Date(NEON_plot_visit_metadata$collectDate), &quot;%Y%m%d&quot;)
+    ),
+    NEON_plot_visit_metadata$sampleID
+  )[!is.na(NEON_plot_visit_metadata$larvaCount)],
+  occurrenceID = NA, # This is just for readability of the final table
+  measurementType = &quot;Larva Count&quot;,
+  measurementValue = as.character(NEON_plot_visit_metadata$larvaCount[!is.na(NEON_plot_visit_metadata$larvaCount)])
+)</code></pre>
+</div>
+<div id="sample-code-barcode" class="section level3">
+<h3>Sample Code (Barcode)</h3>
+<pre class="r"><code>emof_sample_code_data &lt;- data.frame( #only create a row if sampleCount is not NA
+  eventID = ifelse(
+    is.na(NEON_plot_visit_metadata$sampleID), #eventID is the sampleID if a sample is taken, if not, we create one with the same format (plotID.date)
+    paste0(NEON_plot_visit_metadata$plotID, &quot;.&quot;,
+           format(as.Date(NEON_plot_visit_metadata$collectDate), &quot;%Y%m%d&quot;)
+    ),
+    NEON_plot_visit_metadata$sampleID
+  )[!is.na(NEON_plot_visit_metadata$sampleCode)],
+  occurrenceID = NA, # This is just for readability of the final table
+  measurementType = &quot;Sample Barcode&quot;,
+  measurementValue = NEON_plot_visit_metadata$sampleCode[!is.na(NEON_plot_visit_metadata$sampleCode)]
+)</code></pre>
+</div>
+<div id="tick-sample-condition" class="section level3">
+<h3>Tick Sample Condition</h3>
+<pre class="r"><code>emof_tick_sample_condition_data &lt;- data.frame(eventID = NEON_tick_occurrence_data$sampleID,
+                                              occurrenceID = NEON_tick_occurrence_data$subsampleID,
+                                              measurementType = &quot;Tick Sample Condition&quot;,
+                                              measurementValue = NEON_tick_occurrence_data$sampleCondition
+)</code></pre>
+</div>
+<div id="deprecated-vial-id" class="section level3">
+<h3>Deprecated Vial ID</h3>
+<pre class="r"><code>emof_deprecatedVialID_data &lt;- data.frame(eventID = NEON_tick_occurrence_data$sampleID,
+                                         occurrenceID = NEON_tick_occurrence_data$subsampleID,
+                                         measurementType = &quot;Deprecated Vial ID&quot;,
+                                         measurementValue = NEON_tick_occurrence_data$deprecatedVialID
+)</code></pre>
+</div>
+<div id="tick-pathogen-sample-condition" class="section level3">
+<h3>Tick Pathogen Sample Condition</h3>
+<pre class="r"><code>emof_pathogen_sample_condition_data &lt;- data.frame(eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID, &quot;\\.&quot;), 
+                                                                   function(x) paste(x[1:2], collapse = &quot;.&quot;)),
+                                                  occurrenceID = NEON_pathogen_occurrence_data$uid,
+                                                  measurementType = &quot;Tick Pathogen Sample Condition&quot;,
+                                                  measurementValue = NEON_pathogen_occurrence_data$sampleCondition
+)</code></pre>
+</div>
+<div id="cq-quantification-cycle-or-threshold-number-value" class="section level3">
+<h3>CQ (Quantification Cycle or Threshold Number) Value</h3>
+<pre class="r"><code>emof_cqValue_data &lt;- data.frame(
+  eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID[!is.na(NEON_pathogen_occurrence_data$cqValue)], &quot;\\.&quot;),
+                   function(x) paste(x[1:2], collapse = &quot;.&quot;)),
+  occurrenceID = NEON_pathogen_occurrence_data$uid[!is.na(NEON_pathogen_occurrence_data$cqValue)],
+  measurementType = &quot;CQ (Quantification Cycle or Threshold Number) Value&quot;,
+  measurementValue = as.character(NEON_pathogen_occurrence_data$cqValue[!is.na(NEON_pathogen_occurrence_data$cqValue)])
+)</code></pre>
+</div>
+<div id="dna-sample-id" class="section level3">
+<h3>DNA Sample ID</h3>
+<pre class="r"><code>emof_dnaSampleID_data &lt;- data.frame(
+  eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID[!is.na(NEON_pathogen_occurrence_data$dnaSampleID)], &quot;\\.&quot;),
+                   function(x) paste(x[1:2], collapse = &quot;.&quot;)),
+  occurrenceID = NEON_pathogen_occurrence_data$uid[!is.na(NEON_pathogen_occurrence_data$dnaSampleID)],
+  measurementType = &quot;Identifier for DNA sample&quot;,
+  measurementValue = NEON_pathogen_occurrence_data$dnaSampleID[!is.na(NEON_pathogen_occurrence_data$dnaSampleID)]
+)</code></pre>
+</div>
+<div id="dna-sample-code" class="section level3">
+<h3>DNA Sample Code</h3>
+<pre class="r"><code>emof_dnaSampleCode_data &lt;- data.frame(
+  eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID[!is.na(NEON_pathogen_occurrence_data$dnaSampleCode)], &quot;\\.&quot;),
+                   function(x) paste(x[1:2], collapse = &quot;.&quot;)),
+  occurrenceID = NEON_pathogen_occurrence_data$uid[!is.na(NEON_pathogen_occurrence_data$dnaSampleCode)],
+  measurementType = &quot;Barcode of a DNA sample&quot;,
+  measurementValue = NEON_pathogen_occurrence_data$dnaSampleCode[!is.na(NEON_pathogen_occurrence_data$dnaSampleCode)]
+)</code></pre>
+</div>
+<div id="merge-extended-measurement-or-fact-tables" class="section level3">
+<h3>Merge Extended Measurement or Fact Tables</h3>
+<pre class="r"><code>emof_data &lt;- bind_rows(emof_plot_data,
+                       emof_counts_adult_data,
+                       emof_counts_nymph_data,
+                       emof_counts_larva_data,
+                       emof_sample_code_data,
+                       emof_tick_sample_condition_data,
+                       emof_deprecatedVialID_data,
+                       emof_pathogen_sample_condition_data,
+                       emof_cqValue_data,
+                       emof_dnaSampleID_data,
+                       emof_dnaSampleCode_data
+                       )
+rownames(emof_data) &lt;- NULL</code></pre>
+</div>
 </div>
 </div>
 <div id="save-data" class="section level1">
@@ -1150,7 +1284,7 @@ rownames(occurrence_data) &lt;- NULL</code></pre>
 <pre class="r"><code>write.csv(event_data, &quot;outputs/event.csv&quot;, row.names = FALSE)
 write.csv(occurrence_data, &quot;outputs/occurrence.csv&quot;, row.names = FALSE)
 write.csv(resource_relationship_data, &quot;outputs/resourceRelationship.csv&quot;, row.names = FALSE)
-#write.csv(emof_data, &quot;outputs/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)</code></pre>
+write.csv(emof_data, &quot;outputs/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)</code></pre>
 </div>
 
 
