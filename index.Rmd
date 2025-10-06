@@ -1,32 +1,105 @@
 ---
-title: "Mapping NEON Tick and Tick Pathogen Data Survey Monitoring Data to Humboldt Extension"
-subtitle: "See: [Guide for publishing survey & monitoring data (GBIF Draft)](https://docs.gbif-test.org/guide-publishing-survey-data/en/)"
+title: "Mapping NEON Tick and Tick Pathogen Data Survey Monitoring Data to the Humboldt Extension for Ecological Inventories"
+subtitle: "[Guide for publishing biological survey and monitoring data to GBIF](https://docs.gbif.org/guide-publishing-survey-data/en/)"
 author: "Chandra Earl"
 date: "`r Sys.Date()`"
 output: 
   html_document:
     toc: true
     toc_float: true
+    anchor_sections: true
 ---
+<style>
+  #TOC {
+    margin-top: 10px !important;
+  }
+</style>
 
-<https://github.com/sunray1/NEONTickstoHumboldt>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var toc = document.querySelector(".tocify");
+  if (toc) {
+    var logoDiv = document.createElement("div");
+    logoDiv.style.textAlign = "left";
+    logoDiv.style.marginTop = "10px";
+    logoDiv.innerHTML = `
+      <a href="https://www.gbif.org/" target="_blank">
+        <img src="https://docs.gbif.org/style/logo.svg" 
+             alt="GBIF Logo" 
+             style="width:180px; height:auto; margin-left:17px;">
+      </a>
+      <hr style="border: none; border-top: 1px solid #ccc; margin: 10px 0;">
+      <a href="https://github.com/sunray1/NEONTickstoHumboldt" target="_blank" style="text-decoration:none; color:inherit; margin-left:14px;">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" 
+             alt="GitHub repository" style="width:28px; height:auto; vertical-align:middle;">
+        <span style="font-size: 13px; margin-left: 6px;">View on GitHub</span>
+      </a>
+      <hr style="border: none; border-top: 1px solid #ccc; margin: 10px 0;">
+    `;
+    toc.insertBefore(logoDiv, toc.firstChild);
+  }
+});
+</script>
 
-The following code will download tick and tick pathogen data collected by the National Ecological Observatory Network (NEON). The goal is to remap the data to Darwin-Core using the Humboldt Extension. This will include vouchered specimens (Occurrence) and event ecological data (Humboldt).
+# Introduction
+
+This example has been created alongside the [GBIF Guide for publishing biological survey and monitoring data to GBIF](https://docs.gbif.org/guide-publishing-survey-data/en/) to illustrate how data from the [National Ecological Observatory Network (NEON)](https://www.neonscience.org/) can be expressed using Darwin Core and the [Humboldt Extension for Ecological Inventories](https://eco.tdwg.org/). The workflow produces the four core Darwin Core tables used for publishing survey datasets to GBIF: Event, Occurrence, ResourceRelationship, and ExtendedMeasurementOrFact.  
+The dataset is structured hierarchically, with events defined at multiple levels (project, domain, site, plot, and plot visit). Occurrences represent collected ticks as well as subsequent laboratory results derived from them. Contextual information on sampling design, effort, and scope is expressed through Humboldt Extension terms.
+
+## Introduction to NEON Tick Data
+
+The U.S. National Science Foundation’s National Ecological Observatory Network (NEON) carries out long-term, standardized monitoring of tick populations and tick-borne pathogens across the United States. Sampling is conducted only at terrestrial sites, where field staff survey designated plots every three to six weeks during the active tick season. Surveys are performed by dragging or flagging along the 160 m perimeter of each 40 × 40 m plot, and ticks of all life stages are collected and preserved in ethanol.
+
+</br>
+<div style="display: flex; justify-content: center; gap: 1em;">
+  <figure style="text-align: center;">
+    <img src="https://live.staticflickr.com/65535/50754759486_94f857bf43_c.jpg" width="100%">
+    <figcaption>Ecologist dragging for ticks</figcaption>
+  </figure>
+  <figure style="text-align: center;">
+    <img src="https://live.staticflickr.com/65535/48790746127_00c1d1ccfb_c.jpg" width="75%">
+    <figcaption>Collected ticks in ethanol</figcaption>
+  </figure>
+</div>
+</br>
+
+In the laboratory, specimens are identified to species, life stage, and sex when possible. A subset of nymphal ticks is further tested for common pathogens of public health and veterinary concern, including *Borrelia burgdorferi* (Lyme disease), *Anaplasma phagocytophilum* (anaplasmosis), *Babesia microti* (babesiosis), *Ehrlichia* spp., and several *Rickettsia* species. Only morphologically identified nymphs are selected for pathogen testing.  
+
+More details on NEON’s tick monitoring program are available from the [NEON tick data resource page](https://www.neonscience.org/data-collection/ticks). Protocols referenced in the data can be found in the [Document Library](https://data.neonscience.org/documents).
+
+## Introduction to NEON's Hierarchical Dataset Structure
+
+![](https://docs.gbif.org/guide-publishing-survey-data/img/Fig5.png){width=100%}
+
+NEON biological datasets are organized as deeply nested structures that reflect the standardized design of the survey program [Thorpe et al. 2016](https://doi.org/10.1002/ecs2.1627). At the highest level is the project, which defines the scope of the observatory-wide program. Beneath this, the locality component is divided into three spatial scales:
+
+1. 20 ecoclimatic domains,
+2. 81 individual sites (47 terrestrial and 34 aquatic) within those domains, and
+3. Spatial sampling units within each site—such as plots, segments, or reaches—defined according to site type and the requirements of specific protocols.
+
+Locality information at the domain, site, and sampling unit levels is captured at the upper Event levels of the hierarchy. Information specific to individual visits is reported at the lowest Event level. Sampling context is described using the [Darwin Core Event Core](https://dwc.tdwg.org/terms/#event) and [Humboldt Extension](https://rs.gbif.org/extension/eco/Humboldt_2024-04-16.xml), while additional measurements are recorded using the [Extended Measurement or Fact (eMoF) Extension](https://rs.gbif.org/extension/obis/extended_measurement_or_fact_2023-08-28.xml). Depending on the data collected, additional extensions can be incorporated, such as [Multimedia](https://rs.gbif.org/extension/ac/audubon_2020_10_06.xml) or [DNA-derived data](https://rs.gbif.org/extension/gbif/1.0/dna_derived_data_2024-04-17.xml).  
+
+[Occurrence records](https://rs.gbif.org/core/dwc_occurrence_2024-02-23.xml) are linked to the appropriate Event levels to capture what organisms were observed or collected during each visit. In this example, tick specimens collected in the field are represented as preserved specimen occurrences, while pathogen testing results are represented as separate occurrence records. To maintain associations with the original tick specimens, these records are linked back to the host occurrences using the [Resource Relationship Extension](https://rs.gbif.org/extension/resource_relationship_2024-02-19.xml).
+
+See also [Box 1](https://docs.gbif.org/guide-publishing-survey-data/en/#box-1-national-science-foundations-national-ecological-observatory-network-neon-example) of the Guide.
 
 # Load libraries
+
+The code examples in this document use R functions provided by the `neonUtilities` package together with `dplyr` for data manipulation. These libraries allow automated download and processing of NEON data products to prepare them for mapping to Darwin Core and the Humboldt Extension.
 
 ```{r message=FALSE, warning=FALSE}
 library(neonUtilities)
 library(dplyr)
 ```
 
-# Download files
+# Download Data
 
-[NEON 2025a] NEON (National Ecological Observatory Network) [1]. 2025. NEON Tick pathogen status (DP1.10092.001), RELEASE-2025. https://doi.org/10.48443/8nhe-cp13. Dataset accessed from https://data.neonscience.org/data-products/DP1.10092.001/RELEASE-2025 on 2025-09-25.
+The data used in this example come from two NEON data products: tick pathogen status and ticks sampled using drag cloths. This workflow uses data from **[RELEASE-2025](https://data.neonscience.org/data-releases/RELEASE-2025)**.  
 
-[NEON 2025b] NEON (National Ecological Observatory Network) [2]. 2025. NEON Ticks sampled using drag cloths (DP1.10093.001), RELEASE-2025. https://doi.org/10.48443/6zpz-5z19. Dataset accessed from https://data.neonscience.org/data-products/DP1.10093.001/RELEASE-2025 on 2025-09-25.
+- [NEON 2025a] NEON (National Ecological Observatory Network) [1]. 2025. NEON Tick pathogen status (DP1.10092.001), RELEASE-2025. https://doi.org/10.48443/8nhe-cp13. Dataset accessed from [NEON Data Portal](https://data.neonscience.org/data-products/DP1.10092.001/RELEASE-2025) on 2025-09-25.  
+- [NEON 2025b] NEON (National Ecological Observatory Network) [2]. 2025. NEON Ticks sampled using drag cloths (DP1.10093.001), RELEASE-2025. https://doi.org/10.48443/6zpz-5z19. Dataset accessed from [NEON Data Portal](https://data.neonscience.org/data-products/DP1.10093.001/RELEASE-2025) on 2025-09-25.  
 
-I have a NEON token to download data, though I've saved the data as an Rdata file so users don't have to redownload.
+A NEON token was used to download the original data for this workflow. Tokens are optional but recommended, as they allow authenticated access and help avoid API rate limits when downloading large datasets. Users preparing their own mappings may wish to generate a personal token. For more information, see the [Using an API Token when Accessing NEON Data with neonUtilities tutorial](https://www.neonscience.org/resources/learning-hub/tutorials/neon-api-tokens-tutorial) and the [NEON API token documentation](https://data.neonscience.org/data-api/rate-limiting/#api-tokens).
 
 ## Get Tick and Tick Pathogen data
 
@@ -71,11 +144,17 @@ if (file.exists("data/tick.occurrence.RData")) {
 
 ## Map Event Data
 
-Some event data is not included in the NEON data download (data for the project, domain and site). 
+The event hierarchy presented here follows the structure of NEON’s sampling design, with events defined at project, domain, site, sampling unit (plot), and individual sampling event (plot visit) levels. Some event-level information is not provided directly in the NEON data download, such as details describing the overall project, individual domains, and sites. To capture the full hierarchy of the sampling design, these additional levels are reconstructed and included in the event table. The values are hard-coded based on latest (2025-09-24) NEON information.  
 
-All fields from the [Survey event table template](https://github.com/gbif/doc-guide-publishing-survey-data/tree/1.1_postCommReview/data/event_template_wHE_event-table.csv) are included for completeness, even if some are not applicable to this dataset. 
+Domain-level metadata was compiled from NEON documentation and geospatial files. A polygon shapefile defining NEON’s domain boundaries was downloaded from [NEONDomains_2024.zip](https://www.neonscience.org/sites/default/files/NEONDomains_2024.zip) (last updated October 2024, CRS: Geographic WGS 84). Domain centroids (latitude and longitude) and associated uncertainty values were calculated from this shapefile using ArcGIS.  
+
+Site-level metadata was retrieved directly from NEON’s public API on September 24, 2025 using the field site metadata download (*NEON_Field_Site_Metadata_20250924*). This download represents a flattened subset of the full JSON objects returned by the [locations/sites API endpoint](https://data.neonscience.org/api/v0/locations/sites).
+
+All fields from the [survey event table template](https://github.com/gbif/doc-guide-publishing-survey-data/tree/1.1_postCommReview/data/event_template_wHE_event-table.csv) are retained for completeness, even when particular values are not applicable for this dataset.  
 
 ### Project Event
+
+The project event describes the overall tick monitoring program within NEON. It defines the scope of the survey (taxonomic, geographic, temporal), the general sampling protocols, and whether absence, abundance, and material samples are reported.
 
 ```{r}
 NEON_project_event <- data.frame(parentEventID = NA, #Q: should I add namespace to these terms?
@@ -167,8 +246,10 @@ NEON_project_event <- data.frame(parentEventID = NA, #Q: should I add namespace 
 
 ### Domain Events
 
+Domains represent NEON’s ecoclimatic regions. Each domain includes one or more terrestrial sites where tick sampling occurs. Tick data are available for 19 of the 20 NEON domains, as no tick sampling is conducted in Domain 20 (Hawai‘i).
+
 ```{r}
-NEON_domain_metadata <- read.csv("data/neon_domain_METADATA.csv", stringsAsFactors = FALSE)
+NEON_domain_metadata <- read.csv("data/NEON_Domain_Metadata_20250924.csv", stringsAsFactors = FALSE)
 
 NEON_domain_list <- unique(tick.occurrence$tck_fielddata[, c("domainID")])
 
@@ -280,6 +361,8 @@ added_domain_data <- data.frame(parentEventID = "NEON",
 
 
 ### Site Events
+
+Each NEON terrestrial site contains at least six 40×40 m plots designated for tick sampling. Tick sampling is conducted only at terrestrial sites (47 in total), but because no sampling is performed at PUUM in Hawai‘i (Domain 20), only 46 sites are included here. Site events record location metadata, habitat information, and elevation.
 
 ```{r}
 NEON_site_metadata <- read.csv(
@@ -403,6 +486,8 @@ added_site_data <- data.frame(parentEventID = NEON_site_metadata$domain_id[site_
 
 ### Plot Events
 
+Plot events represent the smallest fixed spatial unit within NEON’s tick monitoring design. Each plot is a 40×40 m area where drag or flag sampling is carried out. Plot-level metadata include plot identifiers, habitat classification, and elevation.
+
 ```{r}
 NEON_plot_metadata <- unique(tick.occurrence$tck_fielddata[, c("namedLocation",
                                                                "siteID",
@@ -515,6 +600,8 @@ added_plot_data <- data.frame(parentEventID = NEON_plot_metadata$siteID,
 ```
 
 ### Plot Visit Events
+
+Plot visit events describe the actual sampling bouts, usually every three to six weeks during green-up. At this level, we record specific sampling dates, methods, conditions, and any remarks made during fieldwork. Presence–absence of ticks is also recorded here: if no ticks are collected during a visit, the absence is captured at the event level. These events provide the link between the hierarchical survey design and the occurrence records derived from individual tick or pathogen samples.
 
 Q: I didn't map sampleCondition since we originally had this going to materialEntityRemarks. Since we're not doing materialSample, is this where it should still go?
 
@@ -652,10 +739,18 @@ event_data <- bind_rows(
 rownames(event_data) <- NULL
 ```
 
-
 ## Map Occurrence Data
 
+Occurrence data represent the biological entities observed or derived within events. In this example, two kinds of occurrences are included:  
+
+- Tick specimens collected in the field are represented as preserved specimen records identified to species, life stage, and sex where possible. These records only report presences. Absences of ticks are instead recorded at the plot visit event level, where a complete lack of specimens indicates that no ticks were found during sampling.  
+- Laboratory results from pathogen testing are represented as separate occurrence records derived from those specimens. These records include both positive detections and explicit absences, reflecting whether a pathogen was found in a tested tick.  
+
+To preserve the link between the tested specimens and the pathogens detected (or not detected), pathogen occurrences are connected back to the corresponding tick occurrences using the Darwin Core Resource Relationship extension. All occurrence records are associated with their sampling context through the `eventID` field.
+
 ### Tick Occurrences
+
+Tick occurrence records correspond to individual specimens collected in the field. Attributes such as scientific name, life stage, sex, preparation, and voucher institution are included where available. These records are treated as preserved specimens and are linked to vouchers curated in external collections. All ticks collected prior to 2024 were identified and archived at the U.S. National Tick Collection at Georgia Southern University and tested at the Laboratory of Medical Zoology (LMZ) at the University of Massachusetts Amherst. Currently, ticks are identified and tested at the Laboratory of Medical Zoology (LMZ) at the University of Massachusetts Amherst and archived at the NEON Biorepository at Arizona State University.
 
 ```{r}
 NEON_tick_occurrence_data <- tick.occurrence$tck_taxonomyProcessed
@@ -718,6 +813,9 @@ added_tick_occurrence_data <- data.frame(eventID = NEON_tick_occurrence_data$sam
 ```
 
 ### Tick Pathogen Occurrences
+
+A subset of collected ticks are subsequently tested for pathogens. The results of these tests are represented as separate occurrence records with the basisOfRecord `LaboratoryObservation`. Each record includes details of the test method, result, and pathogen name, and is linked back to the originating tick specimen through the Darwin Core Resource Relationship extension.
+
 ```{r}
 NEON_pathogen_occurrence_data <- tick.pathogen$tck_pathogen %>%
   filter(
@@ -798,6 +896,9 @@ rownames(occurrence_data) <- NULL
 
 
 ## Map Resource Relationship Data
+
+Resource relationships describe links between different occurrences. In this dataset, pathogen detections are linked to the ticks from which they were derived using `relationshipOfResource = "pathogen of"`.
+
 ```{r}
 resource_relationship_data <- data.frame(resourceID = NEON_pathogen_occurrence_data$uid, #occurrenceID (pathogen)
                                          relatedResourceID = NEON_pathogen_occurrence_data$subsampleID, #occurrenceID (tick)
@@ -807,7 +908,10 @@ resource_relationship_data <- data.frame(resourceID = NEON_pathogen_occurrence_d
 
 ## Map Extended Measurement or Fact Data
 
+Certain details do not fit into the core event or occurrence tables. These are represented in the ExtendedMeasurementOrFact (eMoF) table. Examples include plot type, tick counts by life stage, sample barcodes, DNA identifiers, and sample conditions.
+
 ### Plot Type
+
 ```{r}
 emof_plot_data <- data.frame(eventID = NEON_plot_metadata$plotID,
                              occurrenceID = NA, # This is just for readability of the final table
@@ -817,6 +921,7 @@ emof_plot_data <- data.frame(eventID = NEON_plot_metadata$plotID,
 ```
 
 ### Counts
+
 ```{r}
 #Q: I removed records where these are NA, should I keep those in (i.e., and have a record for each event regardless)?
 emof_counts_adult_data <- data.frame( #only create a row if adultCount is not NA
@@ -860,6 +965,7 @@ emof_counts_larva_data <- data.frame( #only create a row if larvaCount is not NA
 ```
 
 ### Sample Code (Barcode)
+
 ```{r}
 emof_sample_code_data <- data.frame( #only create a row if sampleCount is not NA
   eventID = ifelse(
@@ -876,6 +982,7 @@ emof_sample_code_data <- data.frame( #only create a row if sampleCount is not NA
 ```
 
 ### Tick Sample Condition
+
 ```{r}
 emof_tick_sample_condition_data <- data.frame(eventID = NEON_tick_occurrence_data$sampleID,
                                               occurrenceID = NEON_tick_occurrence_data$subsampleID,
@@ -885,6 +992,7 @@ emof_tick_sample_condition_data <- data.frame(eventID = NEON_tick_occurrence_dat
 ```
 
 ### Deprecated Vial ID
+
 ```{r}
 emof_deprecatedVialID_data <- data.frame(eventID = NEON_tick_occurrence_data$sampleID,
                                          occurrenceID = NEON_tick_occurrence_data$subsampleID,
@@ -894,6 +1002,7 @@ emof_deprecatedVialID_data <- data.frame(eventID = NEON_tick_occurrence_data$sam
 ```
 
 ### Tick Pathogen Sample Condition
+
 ```{r}
 emof_pathogen_sample_condition_data <- data.frame(eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID, "\\."), 
                                                                    function(x) paste(x[1:2], collapse = ".")),
@@ -904,6 +1013,7 @@ emof_pathogen_sample_condition_data <- data.frame(eventID = sapply(strsplit(NEON
 ```
 
 ### CQ (Quantification Cycle or Threshold Number) Value
+
 ```{r}
 emof_cqValue_data <- data.frame(
   eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID[!is.na(NEON_pathogen_occurrence_data$cqValue)], "\\."),
@@ -915,6 +1025,7 @@ emof_cqValue_data <- data.frame(
 ```
 
 ### DNA Sample ID
+
 ```{r}
 emof_dnaSampleID_data <- data.frame(
   eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID[!is.na(NEON_pathogen_occurrence_data$dnaSampleID)], "\\."),
@@ -926,6 +1037,7 @@ emof_dnaSampleID_data <- data.frame(
 ```
 
 ### DNA Sample Code
+
 ```{r}
 emof_dnaSampleCode_data <- data.frame(
   eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID[!is.na(NEON_pathogen_occurrence_data$dnaSampleCode)], "\\."),
@@ -937,6 +1049,7 @@ emof_dnaSampleCode_data <- data.frame(
 ```
 
 ### Merge Extended Measurement or Fact Tables
+
 ```{r}
 emof_data <- bind_rows(emof_plot_data,
                        emof_counts_adult_data,
@@ -954,6 +1067,7 @@ rownames(emof_data) <- NULL
 ```
 
 # Save Data
+
 ```{r}
 write.csv(event_data, "outputs/event.csv", row.names = FALSE)
 write.csv(occurrence_data, "outputs/occurrence.csv", row.names = FALSE)
