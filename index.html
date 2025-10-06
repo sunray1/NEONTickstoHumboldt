@@ -2655,6 +2655,8 @@ rownames(emof_data) &lt;- NULL</code></pre>
 </div>
 <div id="save-data" class="section level1 hasAnchor">
 <h1 class="hasAnchor">Save Data<a href="#save-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The processed event and occurrence tables generated through this
+workflow are available in the project repository. <a href="https://github.com/sunray1/NEONTickstoHumboldt/tree/master/outputs">NEONTickstoHumboldt/outputs</a>.</p>
 <pre class="r"><code>write.csv(event_data, &quot;outputs/event.csv&quot;, row.names = FALSE)
 write.csv(occurrence_data, &quot;outputs/occurrence.csv&quot;, row.names = FALSE)
 write.csv(resource_relationship_data, &quot;outputs/resourceRelationship.csv&quot;, row.names = FALSE)

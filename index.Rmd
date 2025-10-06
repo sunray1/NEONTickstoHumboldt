@@ -1,13 +1,14 @@
 ---
-title: "Mapping NEON Tick and Tick Pathogen Data Survey Monitoring Data to the Humboldt Extension for Ecological Inventories"
-subtitle: "[Guide for publishing biological survey and monitoring data to GBIF](https://docs.gbif.org/guide-publishing-survey-data/en/)"
+title: Mapping NEON Tick and Tick Pathogen Data Survey Monitoring Data to the Humboldt
+  Extension for Ecological Inventories
 author: "Chandra Earl"
 date: "`r Sys.Date()`"
-output: 
+output:
   html_document:
-    toc: true
-    toc_float: true
-    anchor_sections: true
+    toc: yes
+    toc_float: yes
+    anchor_sections: yes
+subtitle: "[Guide for publishing biological survey and monitoring data to GBIF](https://docs.gbif.org/guide-publishing-survey-data/en/)"
 ---
 <style>
   #TOC {
@@ -1067,6 +1068,8 @@ rownames(emof_data) <- NULL
 ```
 
 # Save Data
+
+The processed event and occurrence tables generated through this workflow are available in the project repository. [NEONTickstoHumboldt/outputs](https://github.com/sunray1/NEONTickstoHumboldt/tree/master/outputs).
 
 ```{r}
 write.csv(event_data, "outputs/event.csv", row.names = FALSE)
