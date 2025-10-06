@@ -11,7 +11,7 @@
 
 <meta name="author" content="Chandra Earl" />
 
-<meta name="date" content="2025-09-30" />
+<meta name="date" content="2025-10-06" />
 
 <title>Mapping NEON Tick and Tick Pathogen Data Survey Monitoring Data to Humboldt Extension</title>
 
@@ -355,7 +355,7 @@ Survey Monitoring Data to Humboldt Extension</h1>
 <h3 class="subtitle">See: <a href="https://docs.gbif-test.org/guide-publishing-survey-data/en/">Guide
 for publishing survey &amp; monitoring data (GBIF Draft)</a></h3>
 <h4 class="author">Chandra Earl</h4>
-<h4 class="date">2025-09-30</h4>
+<h4 class="date">2025-10-06</h4>
 
 </div>
 
@@ -1133,6 +1133,10 @@ rownames(occurrence_data) &lt;- NULL</code></pre>
 </div>
 <div id="map-resource-relationship-data" class="section level2">
 <h2>Map Resource Relationship Data</h2>
+<pre class="r"><code>resource_relationship_data &lt;- data.frame(resourceID = NEON_pathogen_occurrence_data$uid, #occurrenceID (pathogen)
+                                         relatedResourceID = NEON_pathogen_occurrence_data$subsampleID, #occurrenceID (tick)
+                                         relationshipOfResource = &quot;pathogen of&quot;
+)</code></pre>
 </div>
 <div id="map-emof-data" class="section level2">
 <h2>Map emof Data</h2>
@@ -1145,8 +1149,8 @@ rownames(occurrence_data) &lt;- NULL</code></pre>
 <h1>Save Data</h1>
 <pre class="r"><code>write.csv(event_data, &quot;outputs/event.csv&quot;, row.names = FALSE)
 write.csv(occurrence_data, &quot;outputs/occurrence.csv&quot;, row.names = FALSE)
-#write.csv(emof_data, &quot;outputs/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)
-#write.csv(resourceRelationship_data, &quot;outputs/resourceRelationship.csv&quot;, row.names = FALSE)</code></pre>
+write.csv(resource_relationship_data, &quot;outputs/resourceRelationship.csv&quot;, row.names = FALSE)
+#write.csv(emof_data, &quot;outputs/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)</code></pre>
 </div>
 
 

@@ -795,7 +795,10 @@ rownames(occurrence_data) <- NULL
 
 ## Map Resource Relationship Data
 ```{r}
-
+resource_relationship_data <- data.frame(resourceID = NEON_pathogen_occurrence_data$uid, #occurrenceID (pathogen)
+                                         relatedResourceID = NEON_pathogen_occurrence_data$subsampleID, #occurrenceID (tick)
+                                         relationshipOfResource = "pathogen of"
+)
 ```
 
 ## Map emof Data
@@ -814,6 +817,6 @@ rownames(occurrence_data) <- NULL
 ```{r}
 write.csv(event_data, "outputs/event.csv", row.names = FALSE)
 write.csv(occurrence_data, "outputs/occurrence.csv", row.names = FALSE)
+write.csv(resource_relationship_data, "outputs/resourceRelationship.csv", row.names = FALSE)
 #write.csv(emof_data, "outputs/extendedMeasurementOrFact.csv", row.names = FALSE)
-#write.csv(resourceRelationship_data, "outputs/resourceRelationship.csv", row.names = FALSE)
 ```
