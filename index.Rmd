@@ -3,7 +3,10 @@ title: "Mapping NEON Tick and Tick Pathogen Data Survey Monitoring Data to Humbo
 subtitle: "See: [Guide for publishing survey & monitoring data (GBIF Draft)](https://docs.gbif-test.org/guide-publishing-survey-data/en/)"
 author: "Chandra Earl"
 date: "`r Sys.Date()`"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 <https://github.com/sunray1/NEONTickstoHumboldt>
