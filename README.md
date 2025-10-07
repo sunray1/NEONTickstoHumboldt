@@ -1,4 +1,4 @@
-# Mapping NEON Tick and Tick Pathogen Data Survey Monitoring Data to the Humboldt Extension for Ecological Inventories
+# Mapping NEON Survey Monitoring Data to the Humboldt Extension for Ecological Inventories
 
 This repository provides a worked example of mapping **NEON tick and tick pathogen monitoring data** to **Darwin Core** and the [Humboldt Extension for Ecological Inventories](https://eco.tdwg.org/).  
 
