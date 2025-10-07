@@ -1,5 +1,5 @@
 ---
-title: Mapping NEON Tick and Tick Pathogen Data Survey Monitoring Data to the Humboldt
+title: Mapping NEON Survey Monitoring Data to the Humboldt
   Extension for Ecological Inventories
 author: "Chandra Earl"
 date: "`r Sys.Date()`"
