@@ -158,7 +158,7 @@ All fields from the [survey event table template](https://github.com/gbif/doc-gu
 The project event describes the overall tick monitoring program within NEON. It defines the scope of the survey (taxonomic, geographic, temporal), the general sampling protocols, and whether absence, abundance, and material samples are reported.
 
 ```{r}
-NEON_project_event <- data.frame(parentEventID = NA, #Q: should I add namespace to these terms?
+NEON_project_event <- data.frame(parentEventID = NA,
                                   eventID = "NEON",
                                   siteNestingDescription = "46 terrestrial sites each with at least six 40×40 m plots designated for tick sampling (plots may be decommissioned and reassigned as necessary, but six plots are required for sampling) located across 19 ecoclimatic domains",
                                   siteCount = length(unique(tick.occurrence$tck_fielddata$plotID)),
@@ -192,38 +192,38 @@ NEON_project_event <- data.frame(parentEventID = NA, #Q: should I add namespace 
                                   eventTime = NA,
                                   eventDurationValue = NA,
                                   eventDurationUnit = NA,
-                                  eventType = "project",
-                                  inventoryTypes = NA, #Q: I guess we could consider this an inventory and fill out this and the following, though the guide says only if eventType = Inventory
+                                  eventType = "project", #eventType describes the event, not the internal vocabulary
+                                  inventoryTypes = NA,
                                   compilationTypes = NA,
                                   compilationSourceTypes = NA,
                                   samplingProtocol = "Drag sampling | Flagging",
                                   protocolNames = "Drag sampling | Flagging",
                                   protocolDescriptions = "Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.",
                                   protocolReferences = "Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).",
-                                  isAbsenceReported = "true", #Q: Should this be reported true at this level or only at the event visit level?
+                                  isAbsenceReported = "true",
                                   absentTaxa = NA,
                                   isAbundanceReported = "true",
                                   isAbundanceCapReported = "false",
                                   abundanceCap = NA,
-                                  hasMaterialSamples = "true", #Q: Since we're not explicitly designating these as material samples, should this be false?
+                                  hasMaterialSamples = "true",
                                   materialSampleTypes = "wholeOrganism",
                                   hasVouchers = "true",
                                   voucherInstitutions = "US National Tick Collection, Georgia Southern University",
                                   isLeastSpecificTargetCategoryQuantityInclusive = "false",
                                   dataGeneralizations = NA,
-                                  informationWithheld = NA, #TODO: double check this - I don't think any tick taxa are withheld but I'm not 100% certain
+                                  informationWithheld = NA,
                                   fieldNotes = NA,
                                   eventRemarks = NA,
-                                  verbatimTargetScope = "ticks",
-                                  targetTaxonomicScope = "?Ixodidae", #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm
+                                  verbatimTargetScope = "ticks | selected tick pathogens",
+                                  targetTaxonomicScope = "Ixodidae | Borrelia burgdorferi | Borrelia miyamotoi | Anaplasma phagocytophilum | Rickettsia rickettsii | Ehrlichia chaffeensis | Borrelia lonestari | Babesia microti | Ehrlichia ewingii | Borrelia burgdorferi sensu lato | Ehrlichia muris-like | Borrelia mayonii | Francisella tularensis | Borrelia sp. | Rickettsia parkeri | Rickettsia philipii",
                                   excludedTaxonomicScope = NA,
                                   isTaxonomicScopeFullyReported = "true",
-                                  taxonCompletenessReported = "reportedComplete", #Q: I'm not 100% sure I did these two correctly
-                                  taxonCompletenessProtocols = "Tick drag/flag methods are standardized to comprehensively detect all life stages of Ixodidae during the active season.", #Q: I'm not 100% sure I did these two correctly
+                                  taxonCompletenessReported = "notReported",
+                                  taxonCompletenessProtocols = "Tick drag/flag methods are standardized to maximize detection of all life stages of Ixodidae during the active season.",
                                   hasNonTargetTaxa = "false",
                                   areNonTargetTaxaFullyReported = NA,
                                   nonTargetTaxa = NA,
-                                  identifiedBy = paste(unique(tick.occurrence$tck_taxonomyProcessed$laboratoryName), collapse = " | "), #Q: I could change this to paste(unique(tick.occurrence$tck_taxonomyProcessed$identifiedBy), collapse = " | ") and get the actual list of people who did the identifications, though this is not clean
+                                  identifiedBy = paste(unique(tick.occurrence$tck_taxonomyProcessed$laboratoryName), collapse = " | "),
                                   targetLifeStageScope = "adult | nymph | larvae",
                                   excludedLifeStageScope = "egg",
                                   isLifeStageScopeFullyReported = "true",
@@ -241,7 +241,7 @@ NEON_project_event <- data.frame(parentEventID = NA, #Q: should I add namespace 
                                   samplingEffortProtocol = "Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.",
                                   samplingEffortValue = "6, 160",
                                   samplingEffortUnit = "plots per bout, meters per plot circuit",
-                                  samplingPerformedBy = "NEON Field Staff" #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = " | ") and get the list of actual people, though this has orcid and emails and is quite messy
+                                  samplingPerformedBy = "NEON Field Staff"
                                 )
 ```
 
@@ -287,7 +287,7 @@ added_domain_data <- data.frame(parentEventID = "NEON",
                                 geospatialScopeAreaUnit = "km²",
                                 sampleSizeValue = NA,
                                 sampleSizeUnit = NA,
-                                footprintWKT = NA, #Q: I'm not going to bother with these since they'll be huge
+                                footprintWKT = NA,
                                 footprintSRS = NA,
                                 isVegetationCoverReported = "false",
                                 eventDate = tapply(
@@ -298,34 +298,34 @@ added_domain_data <- data.frame(parentEventID = "NEON",
                                 eventTime = NA,
                                 eventDurationValue = NA,
                                 eventDurationUnit = NA,
-                                eventType = "domain",
+                                eventType = "survey", #eventType describes the event, not the internal vocabulary
                                 inventoryTypes = NA,
                                 compilationTypes = NA,
                                 compilationSourceTypes = NA,
-                                samplingProtocol = "Drag sampling | Flagging", #Sampling protocol terms should be populated for every Event regardless of hierarchical level Q: I took this to mean all the terms described in 5.5. Methodology or sampling protocol (from here up to eventRemarks), or is this just for the four protocol fields?
+                                samplingProtocol = "Drag sampling | Flagging", #Sampling protocol terms (from here up to eventRemarks) should be populated for every Event regardless of hierarchical level
                                 protocolNames = "Drag sampling | Flagging",
                                 protocolDescriptions = "Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.",
                                 protocolReferences = "Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).",
-                                isAbsenceReported = "true", #Q: Should this be reported true at this level or only at the event visit level?
+                                isAbsenceReported = "true",
                                 absentTaxa = NA,
                                 isAbundanceReported = "true",
                                 isAbundanceCapReported = "false",
                                 abundanceCap = NA,
-                                hasMaterialSamples = "true", #Q: Since we're not explicitly designating these as material samples, should this be false?
+                                hasMaterialSamples = "true",
                                 materialSampleTypes = "wholeOrganism",
                                 hasVouchers = "true",
                                 voucherInstitutions = "US National Tick Collection, Georgia Southern University",
                                 isLeastSpecificTargetCategoryQuantityInclusive = "false",
                                 dataGeneralizations = NA,
-                                informationWithheld = NA, #TODO: double check this - I don't think any tick taxa are withheld but I'm not 100% certain
+                                informationWithheld = NA,
                                 fieldNotes = NA,
                                 eventRemarks = NA,
-                                verbatimTargetScope = "ticks", # Recommended best practice is to populate scope terms every Event to which they apply.
-                                targetTaxonomicScope = "?Ixodidae", #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm
+                                verbatimTargetScope = "ticks | selected tick pathogens",
+                                targetTaxonomicScope = "Ixodidae | Borrelia burgdorferi | Borrelia miyamotoi | Anaplasma phagocytophilum | Rickettsia rickettsii | Ehrlichia chaffeensis | Borrelia lonestari | Babesia microti | Ehrlichia ewingii | Borrelia burgdorferi sensu lato | Ehrlichia muris-like | Borrelia mayonii | Francisella tularensis | Borrelia sp. | Rickettsia parkeri | Rickettsia philipii",
                                 excludedTaxonomicScope = NA,
                                 isTaxonomicScopeFullyReported = "true",
-                                taxonCompletenessReported = "reportedComplete", #Q: I'm not 100% sure I did these two correctly
-                                taxonCompletenessProtocols = "Tick drag/flag methods are standardized to comprehensively detect all life stages of Ixodidae during the active season.", #Q: I'm not 100% sure I did these two correctly
+                                taxonCompletenessReported = "notReported",
+                                taxonCompletenessProtocols = "Tick drag/flag methods are standardized to maximize detection of all life stages of Ixodidae during the active season.",
                                 hasNonTargetTaxa = "false",
                                 areNonTargetTaxaFullyReported = NA,
                                 nonTargetTaxa = NA,
@@ -337,8 +337,8 @@ added_domain_data <- data.frame(parentEventID = "NEON",
                                             .groups = "drop") %>%
                                   right_join(data.frame(domainID = NEON_domain_list), by = "domainID") %>%
                                   arrange(match(domainID, NEON_domain_list)) %>%
-                                  mutate(identifiedBy = ifelse(is.na(identifiedBy), NA, identifiedBy)) %>% #Q: Some domains/sites have had no ticks found, so identifiedBy is NA - should this be changed to something more descriptive, like 'No ticks found'?
-                                  pull(identifiedBy), #Q: I could change this to get the actual list of people who did the identifications, though this is not clean
+                                  mutate(identifiedBy = ifelse(is.na(identifiedBy), NA, identifiedBy)) %>% 
+                                  pull(identifiedBy),
                                 targetLifeStageScope = "adult | nymph | larvae",
                                 excludedLifeStageScope = "egg",
                                 isLifeStageScopeFullyReported = "true",
@@ -356,7 +356,7 @@ added_domain_data <- data.frame(parentEventID = "NEON",
                                 samplingEffortProtocol = "Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.",
                                 samplingEffortValue = "6, 160",
                                 samplingEffortUnit = "plots per bout, meters per plot circuit",
-                                samplingPerformedBy = "NEON Field Staff" #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = " | ") and get the list of actual people, though this has orcid and emails and is quite messy
+                                samplingPerformedBy = "NEON Field Staff"
                               )
 ```
 
@@ -397,7 +397,7 @@ added_site_data <- data.frame(parentEventID = NEON_site_metadata$domain_id[site_
                               stateProvince = NEON_site_metadata$site_state[site_idx],
                               decimalLatitude = NEON_site_metadata$latitude[site_idx],
                               decimalLongitude = NEON_site_metadata$longitude[site_idx],
-                              coordinateUncertaintyInMeters = NA, #Q: I can attempt to get uncertainty for each site but we don't have it handy and I'd have to calculate it by hand
+                              coordinateUncertaintyInMeters = NA,
                               geodeticDatum = "WGS84",
                               locality = paste(NEON_site_metadata$site_name[site_idx], " (", NEON_site_metadata$site_id[site_idx], ")", sep = ""),
                               minimumElevationInMeters = NEON_site_metadata$minimum_elevation_m[site_idx],
@@ -411,7 +411,7 @@ added_site_data <- data.frame(parentEventID = NEON_site_metadata$domain_id[site_
                               geospatialScopeAreaUnit = "km²",
                               sampleSizeValue = NA,
                               sampleSizeUnit = NA,
-                              footprintWKT = NA, #Q: I'm not going to bother with these since they'll be huge
+                              footprintWKT = NA,
                               footprintSRS = NA,
                               isVegetationCoverReported = "false",
                               eventDate = tapply(
@@ -422,34 +422,34 @@ added_site_data <- data.frame(parentEventID = NEON_site_metadata$domain_id[site_
                               eventTime = NA,
                               eventDurationValue = NA,
                               eventDurationUnit = NA,
-                              eventType = "site", 
+                              eventType = "survey", #eventType describes the event, not the internal vocabulary
                               inventoryTypes = NA,
                               compilationTypes = NA,
                               compilationSourceTypes = NA,
-                              samplingProtocol = "Drag sampling | Flagging", #Sampling protocol terms should be populated for every Event regardless of hierarchical level Q: I took this to mean all the terms described in 5.5. Methodology or sampling protocol (from here up to eventRemarks), or is this just for the four protocol fields?
+                              samplingProtocol = "Drag sampling | Flagging", #Sampling protocol terms (from here up to eventRemarks) should be populated for every Event regardless of hierarchical level
                               protocolNames = "Drag sampling | Flagging",
                               protocolDescriptions = "Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.",
                               protocolReferences = "Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).",
-                              isAbsenceReported = "true", #Q: Should this be reported true at this level or only at the event visit level?
+                              isAbsenceReported = "true",
                               absentTaxa = NA,
                               isAbundanceReported = "true",
                               isAbundanceCapReported = "false",
                               abundanceCap = NA,
-                              hasMaterialSamples = "true", #Q: Since we're not explicitly designating these as material samples, should this be false?
+                              hasMaterialSamples = "true",
                               materialSampleTypes = "wholeOrganism",
                               hasVouchers = "true",
                               voucherInstitutions = "US National Tick Collection, Georgia Southern University",
                               isLeastSpecificTargetCategoryQuantityInclusive = "false",
                               dataGeneralizations = NA,
-                              informationWithheld = NA, #TODO: double check this - I don't think any tick taxa are withheld but I'm not 100% certain
+                              informationWithheld = NA,
                               fieldNotes = NA,
                               eventRemarks = NA,
-                              verbatimTargetScope = "ticks", # Recommended best practice is to populate scope terms every Event to which they apply.
-                              targetTaxonomicScope = "?Ixodidae", #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm
+                              verbatimTargetScope = "ticks | selected tick pathogens",
+                              targetTaxonomicScope = "Ixodidae | Borrelia burgdorferi | Borrelia miyamotoi | Anaplasma phagocytophilum | Rickettsia rickettsii | Ehrlichia chaffeensis | Borrelia lonestari | Babesia microti | Ehrlichia ewingii | Borrelia burgdorferi sensu lato | Ehrlichia muris-like | Borrelia mayonii | Francisella tularensis | Borrelia sp. | Rickettsia parkeri | Rickettsia philipii",
                               excludedTaxonomicScope = NA,
                               isTaxonomicScopeFullyReported = "true",
-                              taxonCompletenessReported = "reportedComplete", #Q: I'm not 100% sure I did these two correctly
-                              taxonCompletenessProtocols = "Tick drag/flag methods are standardized to comprehensively detect all life stages of Ixodidae during the active season.", #Q: I'm not 100% sure I did these two correctly
+                              taxonCompletenessReported = "notReported",
+                              taxonCompletenessProtocols = "Tick drag/flag methods are standardized to maximize detection of all life stages of Ixodidae during the active season.",
                               hasNonTargetTaxa = "false",
                               areNonTargetTaxaFullyReported = NA,
                               nonTargetTaxa = NA,
@@ -461,8 +461,8 @@ added_site_data <- data.frame(parentEventID = NEON_site_metadata$domain_id[site_
                                           .groups = "drop") %>%
                                 right_join(data.frame(siteID = NEON_site_list), by = "siteID") %>%
                                 arrange(match(siteID, NEON_site_list)) %>%
-                                mutate(identifiedBy = ifelse(is.na(identifiedBy), NA, identifiedBy)) %>% #Q: Some domains/sites have had no ticks found, so identifiedBy is NA - should this be changed to something more descriptive, like 'No ticks found'?
-                                pull(identifiedBy), #Q: I could change this to get the actual list of people who did the identifications, though this is not clean
+                                mutate(identifiedBy = ifelse(is.na(identifiedBy), NA, identifiedBy)) %>% 
+                                pull(identifiedBy),
                               targetLifeStageScope = "adult | nymph | larvae",
                               excludedLifeStageScope = "egg",
                               isLifeStageScopeFullyReported = "true",
@@ -480,7 +480,7 @@ added_site_data <- data.frame(parentEventID = NEON_site_metadata$domain_id[site_
                               samplingEffortProtocol = "Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.",
                               samplingEffortValue = "6, 160",
                               samplingEffortUnit = "plots per bout, meters per plot circuit",
-                              samplingPerformedBy = "NEON Field Staff" #Q: I could change this to paste(unique(tick.occurrence$tck_fielddata$measuredBy), collapse = " | ") and get the list of actual people, though this has orcid and emails and is quite messy
+                              samplingPerformedBy = "NEON Field Staff"
                             )
 
 ```
@@ -542,42 +542,42 @@ added_plot_data <- data.frame(parentEventID = NEON_plot_metadata$siteID,
                               eventTime = NA,
                               eventDurationValue = NA,
                               eventDurationUnit = NA,
-                              eventType = "plot", #Q: This was 'Survey' in the mapping sheet
+                              eventType = "survey", #eventType describes the event, not the internal vocabulary
                               inventoryTypes = NA,
                               compilationTypes = NA,
                               compilationSourceTypes = NA,
-                              samplingProtocol = "Drag sampling | Flagging", #Sampling protocol terms should be populated for every Event regardless of hierarchical level Q: I took this to mean all the terms described in 5.5. Methodology or sampling protocol (from here up to eventRemarks), or is this just for the four protocol fields?
+                              samplingProtocol = "Drag sampling | Flagging", #Sampling protocol terms (from here up to eventRemarks) should be populated for every Event regardless of hierarchical level
                               protocolNames = "Drag sampling | Flagging",
                               protocolDescriptions = "Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.",
                               protocolReferences = "Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).",
-                              isAbsenceReported = "true", #Q: Should this be reported true at this level or only at the event visit level?
+                              isAbsenceReported = "true",
                               absentTaxa = NA,
                               isAbundanceReported = "true",
                               isAbundanceCapReported = "false",
                               abundanceCap = NA,
-                              hasMaterialSamples = "true", #Q: Since we're not explicitly designating these as material samples, should this be false?
+                              hasMaterialSamples = "true",
                               materialSampleTypes = "wholeOrganism",
                               hasVouchers = "true",
                               voucherInstitutions = "US National Tick Collection, Georgia Southern University",
                               isLeastSpecificTargetCategoryQuantityInclusive = "false",
                               dataGeneralizations = NA,
-                              informationWithheld = NA, #TODO: double check this - I don't think any tick taxa are withheld but I'm not 100% certain
+                              informationWithheld = NA,
                               fieldNotes = NA,
                               eventRemarks = NA,
-                              verbatimTargetScope = "ticks", # Recommended best practice is to populate scope terms every Event to which they apply.
-                              targetTaxonomicScope = "?Ixodidae", #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm
+                              verbatimTargetScope = "ticks | selected tick pathogens",
+                              targetTaxonomicScope = "Ixodidae | Borrelia burgdorferi | Borrelia miyamotoi | Anaplasma phagocytophilum | Rickettsia rickettsii | Ehrlichia chaffeensis | Borrelia lonestari | Babesia microti | Ehrlichia ewingii | Borrelia burgdorferi sensu lato | Ehrlichia muris-like | Borrelia mayonii | Francisella tularensis | Borrelia sp. | Rickettsia parkeri | Rickettsia philipii",
                               excludedTaxonomicScope = NA,
                               isTaxonomicScopeFullyReported = "true",
-                              taxonCompletenessReported = "reportedComplete", #Q: I'm not 100% sure I did these two correctly
-                              taxonCompletenessProtocols = "Tick drag/flag methods are standardized to comprehensively detect all life stages of Ixodidae during the active season.", #Q: I'm not 100% sure I did these two correctly
+                              taxonCompletenessReported = "notReported",
+                              taxonCompletenessProtocols = "Tick drag/flag methods are standardized to maximize detection of all life stages of Ixodidae during the active season.",
                               hasNonTargetTaxa = "false",
                               areNonTargetTaxaFullyReported = NA,
                               nonTargetTaxa = NA,
                               identifiedBy = tapply(
                                 tick.occurrence$tck_taxonomyProcessed$laboratoryName,
                                 tick.occurrence$tck_taxonomyProcessed$plotID,
-                                function(x) paste(sort(unique(x)), collapse = " | ") #Q: Some plots have had no ticks identified, so identifiedBy is NA - should this be changed to something more descriptive, like 'No ticks found'?
-                              )[NEON_plot_metadata$plotID], #Q: I could change this to get the actual list of people who did the identifications, though this is not clean
+                                function(x) paste(sort(unique(x)), collapse = " | ")
+                              )[NEON_plot_metadata$plotID],
                               targetLifeStageScope = "adult | nymph | larvae",
                               excludedLifeStageScope = "egg",
                               isLifeStageScopeFullyReported = "true",
@@ -595,7 +595,7 @@ added_plot_data <- data.frame(parentEventID = NEON_plot_metadata$siteID,
                               samplingEffortProtocol = "Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.",
                               samplingEffortValue = "6, 160",
                               samplingEffortUnit = "plots per bout, meters per plot circuit",
-                              samplingPerformedBy = "NEON Field Staff" #Q: I could change this to get the list of actual people, though this has orcid and emails and is quite messy
+                              samplingPerformedBy = "NEON Field Staff"
                             )
 
 ```
@@ -603,8 +603,6 @@ added_plot_data <- data.frame(parentEventID = NEON_plot_metadata$siteID,
 ### Plot Visit Events
 
 Plot visit events describe the actual sampling bouts, usually every three to six weeks during green-up. At this level, we record specific sampling dates, methods, conditions, and any remarks made during fieldwork. Presence–absence of ticks is also recorded here: if no ticks are collected during a visit, the absence is captured at the event level. These events provide the link between the hierarchical survey design and the occurrence records derived from individual tick or pathogen samples.
-
-Q: I didn't map sampleCondition since we originally had this going to materialEntityRemarks. Since we're not doing materialSample, is this where it should still go?
 
 ```{r}
 NEON_plot_visit_metadata <- tick.occurrence$tck_fielddata
@@ -618,7 +616,7 @@ added_plot_visit_data <- data.frame(parentEventID = NEON_plot_visit_metadata$plo
                                                       NEON_plot_visit_metadata$sampleID
                                                     ),
                                     siteNestingDescription = "One visit to a 40x40 m plot designated for tick sampling",
-                                    siteCount = 1, #Q: I don't know if this should be here for this event
+                                    siteCount = 1,
                                     fieldNumber = NA,
                                     verbatimSiteNames = NEON_plot_visit_metadata$plotID,
                                     habitat = NEON_plot_visit_metadata$nlcdClass,
@@ -653,11 +651,11 @@ added_plot_visit_data <- data.frame(parentEventID = NEON_plot_visit_metadata$plo
                                     eventTime = NA,
                                     eventDurationValue = NA,
                                     eventDurationUnit = NA,
-                                    eventType = "plot visit", #Q: This was 'Site Visit' in the mapping sheet
+                                    eventType = "site visit", #eventType describes the event, not the internal vocabulary
                                     inventoryTypes = NA,
                                     compilationTypes = NA,
                                     compilationSourceTypes = NA,
-                                    samplingProtocol = NEON_plot_visit_metadata$samplingMethod, #Sampling protocol terms should be populated for every Event regardless of hierarchical level Q: I took this to mean all the terms described in 5.5. Methodology or sampling protocol (from here up to eventRemarks), or is this just for the four protocol fields?
+                                    samplingProtocol = NEON_plot_visit_metadata$samplingMethod, #Sampling protocol terms (from here up to eventRemarks) should be populated for every Event regardless of hierarchical level
                                     protocolNames = NEON_plot_visit_metadata$samplingMethod,
                                     protocolDescriptions = "Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.",
                                     protocolReferences = paste(NEON_plot_visit_metadata$samplingProtocolVersion, "Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).", sep=" | "),
@@ -665,36 +663,42 @@ added_plot_visit_data <- data.frame(parentEventID = NEON_plot_visit_metadata$plo
                                       is.na(NEON_plot_visit_metadata$targetTaxaPresent),
                                       "false",
                                       "true"
-                                    ), #Q: I only did this at the event level, not the occurrence level (i.e., there are no occurrences with occurrenceStatus = absent) - the guide says otherwise #Q: if targetTaxaPresent is NA (ie. there was no sampling done, should this be NA or false?) #Q: I think I'm getting lost on if this is an attribute of the survey event visit or the protocol
+                                    ),
                                     absentTaxa = ifelse(
-                                      NEON_plot_visit_metadata$targetTaxaPresent == "N", "?Ixodidae", NA #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm  #Q: If there are no absences (i.e., there were ticks found) should this be something besides NA? Should this be a list of species?
+                                      NEON_plot_visit_metadata$targetTaxaPresent == "N", "?Ixodidae", NA
                                     ),
                                     isAbundanceReported = ifelse(
                                       is.na(NEON_plot_visit_metadata$targetTaxaPresent),
                                       "false",
                                       "true"
-                                    ), #Q: I think I'm getting lost on if this is an attribute of the survey event visit or the protocol #Q: If no survey occurred should this be something besides NA?
+                                    ),
                                     isAbundanceCapReported = "false",
                                     abundanceCap = NA,
-                                    hasMaterialSamples = "true", #Q: Since we're not explicitly designating these as material samples, should this be false?
+                                    hasMaterialSamples = "true",
                                     materialSampleTypes = "wholeOrganism",
                                     hasVouchers = "true",
                                     voucherInstitutions = "US National Tick Collection, Georgia Southern University",
                                     isLeastSpecificTargetCategoryQuantityInclusive = "false",
                                     dataGeneralizations = NA,
-                                    informationWithheld = NA, #TODO: double check this - I don't think any tick taxa are withheld but I'm not 100% certain
+                                    informationWithheld = NA,
                                     fieldNotes = NA,
-                                    eventRemarks = NEON_plot_visit_metadata$remarks,
-                                    verbatimTargetScope = "ticks", # Recommended best practice is to populate scope terms every Event to which they apply.
-                                    targetTaxonomicScope = "?Ixodidae", #Q: Since we have pathogens in occurrences, I'm not sure how to designate those here - the ones tested don't have a mca - most are Bacteria but one is a piroplasm
+                                    eventRemarks = ifelse(
+                                      is.na(NEON_plot_visit_metadata$targetTaxaPresent),
+                                      paste(NEON_plot_visit_metadata$remarks,
+                                            "No survey conducted",
+                                            sep = " | "),
+                                      NEON_plot_visit_metadata$remarks
+                                    ),
+                                    verbatimTargetScope = "ticks | selected tick pathogens",
+                                    targetTaxonomicScope = "Ixodidae | Borrelia burgdorferi | Borrelia miyamotoi | Anaplasma phagocytophilum | Rickettsia rickettsii | Ehrlichia chaffeensis | Borrelia lonestari | Babesia microti | Ehrlichia ewingii | Borrelia burgdorferi sensu lato | Ehrlichia muris-like | Borrelia mayonii | Francisella tularensis | Borrelia sp. | Rickettsia parkeri | Rickettsia philipii",
                                     excludedTaxonomicScope = NA,
                                     isTaxonomicScopeFullyReported = "true",
-                                    taxonCompletenessReported = "reportedComplete", #Q: I'm not 100% sure I did these two correctly
-                                    taxonCompletenessProtocols = "Tick drag/flag methods are standardized to comprehensively detect all life stages of Ixodidae during the active season.", #Q: I'm not 100% sure I did these two correctly
+                                    taxonCompletenessReported = "notReported",
+                                    taxonCompletenessProtocols = "Tick drag/flag methods are standardized to maximize detection of all life stages of Ixodidae during the active season.",
                                     hasNonTargetTaxa = "false",
                                     areNonTargetTaxaFullyReported = NA,
                                     nonTargetTaxa = NA,
-                                    identifiedBy = tick.occurrence$tck_fielddata %>% #Q: Some plots have had no ticks identified, so identifiedBy is NA - should this be changed to something more descriptive, like 'No ticks found'?
+                                    identifiedBy = tick.occurrence$tck_fielddata %>% 
                                       left_join(
                                         tick.occurrence$tck_taxonomyProcessed %>%
                                           group_by(sampleID) %>%
@@ -738,6 +742,7 @@ event_data <- bind_rows(
   added_plot_visit_data
 )
 rownames(event_data) <- NULL
+event_data <- event_data %>% select(where(~ !all(is.na(.)))) #Remove columns that are entirely NA
 ```
 
 ## Map Occurrence Data
@@ -829,7 +834,7 @@ NEON_pathogen_occurrence_data <- tick.pathogen$tck_pathogen %>%
 added_pathogen_occurrence_data <- data.frame(eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID, "\\."), 
                                                               function(x) paste(x[1:2], collapse = ".")),
                                              occurrenceID = NEON_pathogen_occurrence_data$uid,
-                                             basisOfRecord = "LaboratoryObservation",  #Q: I'm not sure what to put here
+                                             basisOfRecord = "MaterialSample",
                                              scientificName = NEON_pathogen_occurrence_data$testPathogenName,
                                              taxonRank = NA,
                                              kingdom = c("Borrelia burgdorferi" = "Bacteria",
@@ -853,7 +858,7 @@ added_pathogen_occurrence_data <- data.frame(eventID = sapply(strsplit(NEON_path
                                                                       ),
                                              organismQuantity = NA,
                                              organismQuantityType = NA,
-                                             individualCount = NA, #Recommend not sharing this until we find out specifically what this is actually reporting. Note: this is always 1.
+                                             individualCount = NA,
                                              recordedByID = NA, #This information is in the plot visit event
                                              vernacularName = c("Borrelia burgdorferi" = "Lyme disease agent",
                                                                 "Borrelia miyamotoi" = "Borrelia miyamotoi disease (BMD) agent",
@@ -883,7 +888,7 @@ added_pathogen_occurrence_data <- data.frame(eventID = sapply(strsplit(NEON_path
                                                                           ),
                                              identifiedBy = paste(NEON_pathogen_occurrence_data$testedBy, NEON_pathogen_occurrence_data$laboratoryName, sep=", "),
                                              dateIdentified = NEON_pathogen_occurrence_data$testedDate,
-                                             materialSampleID = NEON_pathogen_occurrence_data$testingID, #Q: Does this need to be remapped or removed since we aren't doing materialSample?
+                                             materialSampleID = NEON_pathogen_occurrence_data$testingID,
                                              materialEntityRemarks = "materialSampleID corresponds to the NEON testingID, which uniquely identifies the individual tick nymph(s) tested."
                                    )
 ```
@@ -893,6 +898,7 @@ added_pathogen_occurrence_data <- data.frame(eventID = sapply(strsplit(NEON_path
 occurrence_data <- bind_rows(added_tick_occurrence_data,
                              added_pathogen_occurrence_data)
 rownames(occurrence_data) <- NULL
+occurrence_data <- occurrence_data %>% select(where(~ !all(is.na(.)))) #Remove columns that are entirely NA
 ```
 
 
@@ -924,7 +930,6 @@ emof_plot_data <- data.frame(eventID = NEON_plot_metadata$plotID,
 ### Counts
 
 ```{r}
-#Q: I removed records where these are NA, should I keep those in (i.e., and have a record for each event regardless)?
 emof_counts_adult_data <- data.frame( #only create a row if adultCount is not NA
   eventID = ifelse( 
     is.na(NEON_plot_visit_metadata$sampleID), #eventID is the sampleID if a sample is taken, if not, we create one with the same format (plotID.date)
@@ -935,7 +940,8 @@ emof_counts_adult_data <- data.frame( #only create a row if adultCount is not NA
   )[!is.na(NEON_plot_visit_metadata$adultCount)],
   occurrenceID = NA, # This is just for readability of the final table
   measurementType = "Adult Count",
-  measurementValue = as.character(NEON_plot_visit_metadata$adultCount[!is.na(NEON_plot_visit_metadata$adultCount)])
+  measurementValue = as.character(NEON_plot_visit_metadata$adultCount[!is.na(NEON_plot_visit_metadata$adultCount)]),
+  measurementRemarks = "Excludes records where adultCount is NA"
 )
 
 emof_counts_nymph_data <- data.frame( #only create a row if nymphCount is not NA
@@ -948,7 +954,8 @@ emof_counts_nymph_data <- data.frame( #only create a row if nymphCount is not NA
   )[!is.na(NEON_plot_visit_metadata$nymphCount)],
   occurrenceID = NA, # This is just for readability of the final table
   measurementType = "Nymph Count",
-  measurementValue = as.character(NEON_plot_visit_metadata$nymphCount[!is.na(NEON_plot_visit_metadata$nymphCount)])
+  measurementValue = as.character(NEON_plot_visit_metadata$nymphCount[!is.na(NEON_plot_visit_metadata$nymphCount)]),
+  measurementRemarks = "Excludes records where nymphCount is NA"
 )
 
 emof_counts_larva_data <- data.frame( #only create a row if larvaCount is not NA
@@ -961,7 +968,8 @@ emof_counts_larva_data <- data.frame( #only create a row if larvaCount is not NA
   )[!is.na(NEON_plot_visit_metadata$larvaCount)],
   occurrenceID = NA, # This is just for readability of the final table
   measurementType = "Larva Count",
-  measurementValue = as.character(NEON_plot_visit_metadata$larvaCount[!is.na(NEON_plot_visit_metadata$larvaCount)])
+  measurementValue = as.character(NEON_plot_visit_metadata$larvaCount[!is.na(NEON_plot_visit_metadata$larvaCount)]),
+  measurementRemarks = "Excludes records where larvaCount is NA"
 )
 ```
 
@@ -1049,6 +1057,18 @@ emof_dnaSampleCode_data <- data.frame(
 )
 ```
 
+### Pathogen Individual Count
+
+```{r}
+emof_pathogenIndividualCount_data <- data.frame(
+  eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID[!is.na(NEON_pathogen_occurrence_data$individualCount)], "\\."),
+                   function(x) paste(x[1:2], collapse = ".")),
+  occurrenceID = NEON_pathogen_occurrence_data$uid[!is.na(NEON_pathogen_occurrence_data$individualCount)],
+  measurementType = "Number of Ticks Used for Testing",
+  measurementValue = as.character(NEON_pathogen_occurrence_data$individualCount[!is.na(NEON_pathogen_occurrence_data$individualCount)])
+)
+```
+
 ### Merge Extended Measurement or Fact Tables
 
 ```{r}
@@ -1062,9 +1082,11 @@ emof_data <- bind_rows(emof_plot_data,
                        emof_pathogen_sample_condition_data,
                        emof_cqValue_data,
                        emof_dnaSampleID_data,
-                       emof_dnaSampleCode_data
+                       emof_dnaSampleCode_data,
+                       emof_pathogenIndividualCount_data
                        )
 rownames(emof_data) <- NULL
+emof_data <- emof_data %>% select(where(~ !all(is.na(.)))) #Remove columns that are entirely NA
 ```
 
 # Save Data
