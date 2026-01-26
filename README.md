@@ -22,8 +22,8 @@ The workflow was developed for the [GBIF Guide for publishing biological survey 
 
 The workflow draws on two NEON data products:  
 
-- **Tick pathogen status** ([DP1.10092.001](https://data.neonscience.org/data-products/DP1.10092.001/RELEASE-2025))  
-- **Ticks sampled using drag cloths** ([DP1.10093.001](https://data.neonscience.org/data-products/DP1.10093.001/RELEASE-2025))  
+- **Tick pathogen status** ([DP1.10092.001](https://doi.org/10.48443/n2yp-5a62))  
+- **Ticks sampled using drag cloths** ([DP1.10093.001](https://doi.org/10.48443/5e20-3763))  
 
 See the [NEON tick monitoring program](https://www.neonscience.org/data-collection/ticks) for details.
 
