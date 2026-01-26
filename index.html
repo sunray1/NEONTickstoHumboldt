@@ -9,9 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Chandra Earl" />
+<meta name="author" content="Chandra Earl, Kate Ingenloff" />
 
-<meta name="date" content="2025-10-07" />
+<meta name="date" content="2026-01-26" />
 
 <title>Mapping NEON Survey Monitoring Data to the Humboldt Extension for Ecological Inventories</title>
 
@@ -1503,8 +1503,8 @@ border-radius: 0px;
 Humboldt Extension for Ecological Inventories</h1>
 <h3 class="subtitle"><a href="https://docs.gbif.org/guide-publishing-survey-data/en/">Guide for
 publishing biological survey and monitoring data to GBIF</a></h3>
-<h4 class="author">Chandra Earl</h4>
-<h4 class="date">2025-10-07</h4>
+<h4 class="author">Chandra Earl, Kate Ingenloff</h4>
+<h4 class="date">2026-01-26</h4>
 
 </div>
 
@@ -1647,18 +1647,18 @@ library(dplyr)</code></pre>
 <h1 class="hasAnchor">Download Data<a href="#download-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>The data used in this example come from two NEON data products: tick
 pathogen status and ticks sampled using drag cloths. This workflow uses
-data from <strong><a href="https://data.neonscience.org/data-releases/RELEASE-2025">RELEASE-2025</a></strong>.</p>
+data from <strong><a href="https://www.neonscience.org/data-samples/data-management/data-revisions-releases/RELEASE-2026">RELEASE-2026</a></strong>.</p>
 <ul>
-<li>[NEON 2025a] NEON (National Ecological Observatory Network) [1].
-2025. NEON Tick pathogen status (DP1.10092.001), RELEASE-2025. <a href="https://doi.org/10.48443/8nhe-cp13" class="uri">https://doi.org/10.48443/8nhe-cp13</a>. Dataset accessed
+<li>[NEON 2026a] NEON (National Ecological Observatory Network) [1].
+2026. NEON Tick pathogen status (DP1.10092.001), RELEASE-2026. <a href="https://doi.org/10.48443/n2yp-5a62" class="uri">https://doi.org/10.48443/n2yp-5a62</a>. Dataset accessed
 from <a href="https://data.neonscience.org/data-products/DP1.10092.001/RELEASE-2025">NEON
-Data Portal</a> on 2025-09-25.<br />
+Data Portal</a> on 2026-01-23.<br />
 </li>
-<li>[NEON 2025b] NEON (National Ecological Observatory Network) [2].
-2025. NEON Ticks sampled using drag cloths (DP1.10093.001),
-RELEASE-2025. <a href="https://doi.org/10.48443/6zpz-5z19" class="uri">https://doi.org/10.48443/6zpz-5z19</a>. Dataset accessed
-from <a href="https://data.neonscience.org/data-products/DP1.10093.001/RELEASE-2025">NEON
-Data Portal</a> on 2025-09-25.</li>
+<li>[NEON 2026b] NEON (National Ecological Observatory Network) [2].
+2026. NEON Ticks sampled using drag cloths (DP1.10093.001),
+RELEASE-2026. <a href="https://doi.org/10.48443/5e20-3763" class="uri">https://doi.org/10.48443/5e20-3763</a>. Dataset accessed
+from <a href="https://data.neonscience.org/data-products/DP1.10093.001/RELEASE-2026">NEON
+Data Portal</a> on 2026-01-23.</li>
 </ul>
 <p>A NEON token was used to download the original data for this
 workflow. Tokens are optional but recommended, as they allow
@@ -1684,7 +1684,7 @@ if (file.exists(&quot;data/tick.pathogen.RData&quot;)) {
   
   tick.pathogen &lt;- loadByProduct(dpID=&quot;DP1.10092.001&quot;, 
                                  package = &quot;basic&quot;,
-                                 release = &quot;RELEASE-2025&quot;,
+                                 release = &quot;RELEASE-2026&quot;,
                                  token = Sys.getenv(&quot;NEON_TOKEN&quot;),
                                  check.size = F)
   
@@ -1697,7 +1697,7 @@ if (file.exists(&quot;data/tick.occurrence.RData&quot;)) {
   
   tick.occurrence &lt;- loadByProduct(dpID=&quot;DP1.10093.001&quot;, 
                                    package = &quot;basic&quot;,
-                                   release = &quot;RELEASE-2025&quot;,
+                                   release = &quot;RELEASE-2026&quot;,
                                    token = Sys.getenv(&quot;NEON_TOKEN&quot;),
                                    check.size = F)
   
@@ -1755,8 +1755,8 @@ abundance, and material samples are reported.</p>
                                   coordinateUncertaintyInMeters = NA,
                                   geodeticDatum = NA,
                                   locality = NA,
-                                  totalAreaSampledValue = length(unique(tick.occurrence$tck_fielddata$plotID)) * 40 * 4, #summed value of plot perimeters
-                                  totalAreaSampledUnit = &quot;m&quot;,
+                                  totalAreaSampledValue = NA,
+                                  totalAreaSampledUnit = NA,
                                   geospatialScopeAreaValue = 9428288, #full geographic extent of USA-NEON boundaries
                                   geospatialScopeAreaUnit = &quot;km²&quot;,
                                   sampleSizeValue = NA,
@@ -1780,7 +1780,7 @@ abundance, and material samples are reported.</p>
                                   protocolNames = &quot;Drag sampling | Flagging&quot;,
                                   protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
                                   protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
-                                  isAbsenceReported = &quot;true&quot;,
+                                  isAbsenceReported = NA,
                                   absentTaxa = NA,
                                   isAbundanceReported = &quot;true&quot;,
                                   isAbundanceCapReported = &quot;false&quot;,
@@ -1859,10 +1859,8 @@ added_domain_data &lt;- data.frame(parentEventID = &quot;NEON&quot;,
                                 coordinateUncertaintyInMeters = NEON_domain_metadata$coordinateUncertaintyinMeters[domain_idx],
                                 geodeticDatum = &quot;WGS84&quot;,
                                 locality = paste(NEON_domain_metadata$domain_name[domain_idx], &quot; (&quot;, NEON_domain_metadata$domain_id[domain_idx], &quot;)&quot;, sep = &quot;&quot;),
-                                totalAreaSampledValue = tapply(tick.occurrence$tck_fielddata$plotID, #summed value of surveyed plot perimeters in domain
-                                                               tick.occurrence$tck_fielddata$domainID,
-                                                               function(x) length(unique(x)))[NEON_domain_list] * 40 * 4,
-                                totalAreaSampledUnit = &quot;m&quot;,
+                                totalAreaSampledValue = NA,
+                                totalAreaSampledUnit = NA,
                                 geospatialScopeAreaValue = NEON_domain_metadata$sq_km[domain_idx],
                                 geospatialScopeAreaUnit = &quot;km²&quot;,
                                 sampleSizeValue = NA,
@@ -1886,7 +1884,7 @@ added_domain_data &lt;- data.frame(parentEventID = &quot;NEON&quot;,
                                 protocolNames = &quot;Drag sampling | Flagging&quot;,
                                 protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
                                 protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
-                                isAbsenceReported = &quot;true&quot;,
+                                isAbsenceReported = NA,
                                 absentTaxa = NA,
                                 isAbundanceReported = &quot;true&quot;,
                                 isAbundanceCapReported = &quot;false&quot;,
@@ -1899,7 +1897,14 @@ added_domain_data &lt;- data.frame(parentEventID = &quot;NEON&quot;,
                                 dataGeneralizations = NA,
                                 informationWithheld = NA,
                                 fieldNotes = NA,
-                                eventRemarks = NA,
+                                eventRemarks = ifelse(!(NEON_domain_list %in% (
+                                                tick.occurrence$tck_taxonomyProcessed %&gt;%
+                                                  left_join(tick.occurrence$tck_fielddata %&gt;% dplyr::select(sampleID, domainID), by = c(&quot;sampleID&quot;, &quot;domainID&quot;)) %&gt;%
+                                                  dplyr::distinct(domainID) %&gt;%
+                                                  dplyr::pull(domainID)
+                                              )),
+                                              &quot;identifiedBy is NA because there are no occurrence records for this event&quot;,
+                                              NA),
                                 verbatimTargetScope = &quot;ticks | selected tick pathogens&quot;,
                                 targetTaxonomicScope = &quot;Ixodidae | Borrelia burgdorferi | Borrelia miyamotoi | Anaplasma phagocytophilum | Rickettsia rickettsii | Ehrlichia chaffeensis | Borrelia lonestari | Babesia microti | Ehrlichia ewingii | Borrelia burgdorferi sensu lato | Ehrlichia muris-like | Borrelia mayonii | Francisella tularensis | Borrelia sp. | Rickettsia parkeri | Rickettsia philipii&quot;,
                                 excludedTaxonomicScope = NA,
@@ -1911,7 +1916,7 @@ added_domain_data &lt;- data.frame(parentEventID = &quot;NEON&quot;,
                                 nonTargetTaxa = NA,
                                 identifiedBy = tick.occurrence$tck_taxonomyProcessed %&gt;% 
                                   left_join(tick.occurrence$tck_fielddata %&gt;% select(sampleID, domainID),
-                                            by = &quot;sampleID&quot;) %&gt;%
+                                            by = c(&quot;sampleID&quot;, &quot;domainID&quot;)) %&gt;%
                                   group_by(domainID) %&gt;%
                                   summarise(identifiedBy = paste(sort(unique(laboratoryName)), collapse = &quot; | &quot;),
                                             .groups = &quot;drop&quot;) %&gt;%
@@ -1983,10 +1988,8 @@ added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[si
                               minimumElevationInMeters = NEON_site_metadata$minimum_elevation_m[site_idx],
                               maximumElevationInMeters = NEON_site_metadata$maximum_elevation_m[site_idx],
                               verbatimElevation = paste(NEON_site_metadata$mean_evelation_m[site_idx], &quot;m&quot;, sep=&quot;&quot;),
-                              totalAreaSampledValue = tapply(tick.occurrence$tck_fielddata$plotID, #summed value of surveyed plot perimeters in site
-                                                             tick.occurrence$tck_fielddata$siteID,
-                                                             function(x) length(unique(x)))[NEON_site_list] * 40 * 4,
-                              totalAreaSampledUnit = &quot;m&quot;,
+                              totalAreaSampledValue = NA,
+                              totalAreaSampledUnit = NA,
                               geospatialScopeAreaValue = NEON_site_metadata$terrestrial_sampling_boundary_size_km2[site_idx],
                               geospatialScopeAreaUnit = &quot;km²&quot;,
                               sampleSizeValue = NA,
@@ -2010,7 +2013,7 @@ added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[si
                               protocolNames = &quot;Drag sampling | Flagging&quot;,
                               protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
                               protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
-                              isAbsenceReported = &quot;true&quot;,
+                              isAbsenceReported = NA,
                               absentTaxa = NA,
                               isAbundanceReported = &quot;true&quot;,
                               isAbundanceCapReported = &quot;false&quot;,
@@ -2023,7 +2026,14 @@ added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[si
                               dataGeneralizations = NA,
                               informationWithheld = NA,
                               fieldNotes = NA,
-                              eventRemarks = NA,
+                              eventRemarks = ifelse(!(NEON_site_list %in% (
+                                                tick.occurrence$tck_taxonomyProcessed %&gt;%
+                                                  left_join(tick.occurrence$tck_fielddata %&gt;% dplyr::select(sampleID, siteID), by = c(&quot;sampleID&quot;, &quot;siteID&quot;)) %&gt;%
+                                                  dplyr::distinct(siteID) %&gt;%
+                                                  dplyr::pull(siteID)
+                                              )),
+                                              &quot;identifiedBy is NA because there are no occurrence records for this event&quot;,
+                                              NA),
                               verbatimTargetScope = &quot;ticks | selected tick pathogens&quot;,
                               targetTaxonomicScope = &quot;Ixodidae | Borrelia burgdorferi | Borrelia miyamotoi | Anaplasma phagocytophilum | Rickettsia rickettsii | Ehrlichia chaffeensis | Borrelia lonestari | Babesia microti | Ehrlichia ewingii | Borrelia burgdorferi sensu lato | Ehrlichia muris-like | Borrelia mayonii | Francisella tularensis | Borrelia sp. | Rickettsia parkeri | Rickettsia philipii&quot;,
                               excludedTaxonomicScope = NA,
@@ -2035,7 +2045,7 @@ added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[si
                               nonTargetTaxa = NA,
                               identifiedBy = tick.occurrence$tck_taxonomyProcessed %&gt;% 
                                 left_join(tick.occurrence$tck_fielddata %&gt;% select(sampleID, siteID),
-                                          by = &quot;sampleID&quot;) %&gt;%
+                                          by = c(&quot;sampleID&quot;, &quot;siteID&quot;)) %&gt;%
                                 group_by(siteID) %&gt;%
                                 summarise(identifiedBy = paste(sort(unique(laboratoryName)), collapse = &quot; | &quot;),
                                           .groups = &quot;drop&quot;) %&gt;%
@@ -2081,7 +2091,7 @@ habitat classification, and elevation.</p>
                                                                &quot;elevation&quot;,
                                                                &quot;elevationUncertainty&quot;)])
 
-NEON_plot_metadata &lt;- NEON_plot_metadata %&gt;% #There&#39;s an issue where plot JERC_081 has two elevations, causing it to be duplicated, so we&#39;ll just remove the first one
+NEON_plot_metadata &lt;- NEON_plot_metadata %&gt;% #There&#39;s an issue where a few plots have two recorded elevations, causing them to be duplicated, so we&#39;ll just remove the first one for each
   distinct(namedLocation, plotID, .keep_all = TRUE)
 
 added_plot_data &lt;- data.frame(parentEventID = NEON_plot_metadata$siteID,
@@ -2104,12 +2114,12 @@ added_plot_data &lt;- data.frame(parentEventID = NEON_plot_metadata$siteID,
                               minimumElevationinMeters = NEON_plot_metadata$elevation - NEON_plot_metadata$elevationUncertainty,
                               maximumElevationinMeters = NEON_plot_metadata$elevation + NEON_plot_metadata$elevationUncertainty,
                               verbatimElevation = paste(NEON_plot_metadata$elevation, &quot;m&quot;, sep=&quot;&quot;),
-                              totalAreaSampledValue = 40 * 4,
-                              totalAreaSampledUnit = &quot;m&quot;,
-                              geospatialScopeAreaValue = 40 * 4,
-                              geospatialScopeAreaUnit = &quot;m&quot;,
-                              sampleSizeValue = NA,
-                              sampleSizeUnit = NA,
+                              totalAreaSampledValue = NA,
+                              totalAreaSampledUnit = NA,
+                              geospatialScopeAreaValue = NA,
+                              geospatialScopeAreaUnit = NA,
+                              sampleSizeValue = 40 * 4,
+                              sampleSizeUnit = &quot;m&quot;,
                               footprintWKT = NA,
                               footprintSRS = NA,
                               isVegetationCoverReported = &quot;false&quot;,
@@ -2129,7 +2139,7 @@ added_plot_data &lt;- data.frame(parentEventID = NEON_plot_metadata$siteID,
                               protocolNames = &quot;Drag sampling | Flagging&quot;,
                               protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
                               protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
-                              isAbsenceReported = &quot;true&quot;,
+                              isAbsenceReported = NA,
                               absentTaxa = NA,
                               isAbundanceReported = &quot;true&quot;,
                               isAbundanceCapReported = &quot;false&quot;,
@@ -2142,7 +2152,14 @@ added_plot_data &lt;- data.frame(parentEventID = NEON_plot_metadata$siteID,
                               dataGeneralizations = NA,
                               informationWithheld = NA,
                               fieldNotes = NA,
-                              eventRemarks = NA,
+                              eventRemarks = ifelse(!(NEON_plot_metadata$plotID %in% names(tapply(
+                                                tick.occurrence$tck_taxonomyProcessed$laboratoryName,
+                                                tick.occurrence$tck_taxonomyProcessed$plotID,
+                                                function(x) paste(sort(unique(x)), collapse = &quot; | &quot;)
+                                              ))),
+                                              &quot;identifiedBy is NA because there are no occurrence records for this event&quot;,
+                                              NA
+                                            ),
                               verbatimTargetScope = &quot;ticks | selected tick pathogens&quot;,
                               targetTaxonomicScope = &quot;Ixodidae | Borrelia burgdorferi | Borrelia miyamotoi | Anaplasma phagocytophilum | Rickettsia rickettsii | Ehrlichia chaffeensis | Borrelia lonestari | Babesia microti | Ehrlichia ewingii | Borrelia burgdorferi sensu lato | Ehrlichia muris-like | Borrelia mayonii | Francisella tularensis | Borrelia sp. | Rickettsia parkeri | Rickettsia philipii&quot;,
                               excludedTaxonomicScope = NA,
@@ -2218,14 +2235,14 @@ added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$
                                     minimumElevationinMeters = NEON_plot_visit_metadata$elevation - NEON_plot_visit_metadata$elevationUncertainty,
                                     maximumElevationinMeters = NEON_plot_visit_metadata$elevation + NEON_plot_visit_metadata$elevationUncertainty,
                                     verbatimElevation = paste(NEON_plot_visit_metadata$elevation, &quot;m&quot;, sep=&quot;&quot;),
-                                    totalAreaSampledValue = NEON_plot_visit_metadata$totalSampledArea,
-                                    totalAreaSampledUnit = ifelse(
-                                      is.na(NEON_plot_visit_metadata$totalSampledArea), NA, &quot;m&quot;
-                                    ),
+                                    totalAreaSampledValue = NA,
+                                    totalAreaSampledUnit = NA,
                                     geospatialScopeAreaValue = NA,
                                     geospatialScopeAreaUnit = NA,
-                                    sampleSizeValue = NA,
-                                    sampleSizeUnit = NA,
+                                    sampleSizeValue = NEON_plot_visit_metadata$totalSampledArea,
+                                    sampleSizeUnit = ifelse(
+                                      is.na(NEON_plot_visit_metadata$totalSampledArea), NA, &quot;m&quot;
+                                    ),
                                     footprintWKT = NA,
                                     footprintSRS = NA,
                                     isVegetationCoverReported = &quot;false&quot;,
@@ -2241,14 +2258,8 @@ added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$
                                     protocolNames = NEON_plot_visit_metadata$samplingMethod,
                                     protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
                                     protocolReferences = paste(NEON_plot_visit_metadata$samplingProtocolVersion, &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;, sep=&quot; | &quot;),
-                                    isAbsenceReported = ifelse(
-                                      is.na(NEON_plot_visit_metadata$targetTaxaPresent),
-                                      &quot;false&quot;,
-                                      &quot;true&quot;
-                                    ),
-                                    absentTaxa = ifelse(
-                                      NEON_plot_visit_metadata$targetTaxaPresent == &quot;N&quot;, &quot;?Ixodidae&quot;, NA
-                                    ),
+                                    isAbsenceReported = NA,
+                                    absentTaxa = NA,
                                     isAbundanceReported = ifelse(
                                       is.na(NEON_plot_visit_metadata$targetTaxaPresent),
                                       &quot;false&quot;,
@@ -2256,21 +2267,50 @@ added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$
                                     ),
                                     isAbundanceCapReported = &quot;false&quot;,
                                     abundanceCap = NA,
-                                    hasMaterialSamples = &quot;true&quot;,
+                                    hasMaterialSamples = ifelse(
+                                      is.na(NEON_plot_visit_metadata$targetTaxaPresent),
+                                      &quot;false&quot;,
+                                      &quot;true&quot;
+                                    ),
                                     materialSampleTypes = &quot;wholeOrganism&quot;,
-                                    hasVouchers = &quot;true&quot;,
+                                    hasVouchers = ifelse(
+                                      is.na(NEON_plot_visit_metadata$targetTaxaPresent),
+                                      &quot;false&quot;,
+                                      &quot;true&quot;
+                                    ),
                                     voucherInstitutions = &quot;US National Tick Collection, Georgia Southern University&quot;,
                                     isLeastSpecificTargetCategoryQuantityInclusive = &quot;false&quot;,
                                     dataGeneralizations = NA,
                                     informationWithheld = NA,
                                     fieldNotes = NA,
-                                    eventRemarks = ifelse(
-                                      is.na(NEON_plot_visit_metadata$targetTaxaPresent),
-                                      paste(NEON_plot_visit_metadata$remarks,
-                                            &quot;No survey conducted&quot;,
-                                            sep = &quot; | &quot;),
-                                      NEON_plot_visit_metadata$remarks
-                                    ),
+                                    eventRemarks = local({
+                                      base &lt;- ifelse(
+                                        is.na(NEON_plot_visit_metadata$targetTaxaPresent),
+                                        ifelse(
+                                          is.na(NEON_plot_visit_metadata$remarks),
+                                          &quot;No survey conducted&quot;,
+                                          paste(NEON_plot_visit_metadata$remarks, &quot;No survey conducted&quot;, sep = &quot;; &quot;)
+                                        ),
+                                        NEON_plot_visit_metadata$remarks
+                                      )
+                                    
+                                      miss_id &lt;- !(tick.occurrence$tck_fielddata$sampleID %in%
+                                                     tick.occurrence$tck_taxonomyProcessed$sampleID)
+                                    
+                                      ifelse(
+                                        miss_id,
+                                        ifelse(
+                                          is.na(base),
+                                          &quot;identifiedBy is NA because there are no occurrence records for this event&quot;,
+                                          paste(
+                                            base,
+                                            &quot;identifiedBy is NA because there are no occurrence records for this event&quot;,
+                                            sep = &quot;; &quot;
+                                          )
+                                        ),
+                                        base
+                                      )
+                                    }),
                                     verbatimTargetScope = &quot;ticks | selected tick pathogens&quot;,
                                     targetTaxonomicScope = &quot;Ixodidae | Borrelia burgdorferi | Borrelia miyamotoi | Anaplasma phagocytophilum | Rickettsia rickettsii | Ehrlichia chaffeensis | Borrelia lonestari | Babesia microti | Ehrlichia ewingii | Borrelia burgdorferi sensu lato | Ehrlichia muris-like | Borrelia mayonii | Francisella tularensis | Borrelia sp. | Rickettsia parkeri | Rickettsia philipii&quot;,
                                     excludedTaxonomicScope = NA,

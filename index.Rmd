@@ -1,7 +1,7 @@
 ---
 title: Mapping NEON Survey Monitoring Data to the Humboldt
   Extension for Ecological Inventories
-author: "Chandra Earl"
+author: "Chandra Earl, Kate Ingenloff"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -95,10 +95,10 @@ library(dplyr)
 
 # Download Data
 
-The data used in this example come from two NEON data products: tick pathogen status and ticks sampled using drag cloths. This workflow uses data from **[RELEASE-2025](https://data.neonscience.org/data-releases/RELEASE-2025)**.  
+The data used in this example come from two NEON data products: tick pathogen status and ticks sampled using drag cloths. This workflow uses data from **[RELEASE-2026](https://www.neonscience.org/data-samples/data-management/data-revisions-releases/RELEASE-2026)**.  
 
-- [NEON 2025a] NEON (National Ecological Observatory Network) [1]. 2025. NEON Tick pathogen status (DP1.10092.001), RELEASE-2025. https://doi.org/10.48443/8nhe-cp13. Dataset accessed from [NEON Data Portal](https://data.neonscience.org/data-products/DP1.10092.001/RELEASE-2025) on 2025-09-25.  
-- [NEON 2025b] NEON (National Ecological Observatory Network) [2]. 2025. NEON Ticks sampled using drag cloths (DP1.10093.001), RELEASE-2025. https://doi.org/10.48443/6zpz-5z19. Dataset accessed from [NEON Data Portal](https://data.neonscience.org/data-products/DP1.10093.001/RELEASE-2025) on 2025-09-25.  
+- [NEON 2026a] NEON (National Ecological Observatory Network) [1]. 2026. NEON Tick pathogen status (DP1.10092.001), RELEASE-2026. https://doi.org/10.48443/n2yp-5a62. Dataset accessed from [NEON Data Portal](https://data.neonscience.org/data-products/DP1.10092.001/RELEASE-2025) on 2026-01-23.  
+- [NEON 2026b] NEON (National Ecological Observatory Network) [2]. 2026. NEON Ticks sampled using drag cloths (DP1.10093.001), RELEASE-2026. https://doi.org/10.48443/5e20-3763. Dataset accessed from [NEON Data Portal](https://data.neonscience.org/data-products/DP1.10093.001/RELEASE-2026) on 2026-01-23.  
 
 A NEON token was used to download the original data for this workflow. Tokens are optional but recommended, as they allow authenticated access and help avoid API rate limits when downloading large datasets. Users preparing their own mappings may wish to generate a personal token. For more information, see the [Using an API Token when Accessing NEON Data with neonUtilities tutorial](https://www.neonscience.org/resources/learning-hub/tutorials/neon-api-tokens-tutorial) and the [NEON API token documentation](https://data.neonscience.org/data-api/rate-limiting/#api-tokens).
 
@@ -119,7 +119,7 @@ if (file.exists("data/tick.pathogen.RData")) {
   
   tick.pathogen <- loadByProduct(dpID="DP1.10092.001", 
                                  package = "basic",
-                                 release = "RELEASE-2025",
+                                 release = "RELEASE-2026",
                                  token = Sys.getenv("NEON_TOKEN"),
                                  check.size = F)
   
@@ -132,7 +132,7 @@ if (file.exists("data/tick.occurrence.RData")) {
   
   tick.occurrence <- loadByProduct(dpID="DP1.10093.001", 
                                    package = "basic",
-                                   release = "RELEASE-2025",
+                                   release = "RELEASE-2026",
                                    token = Sys.getenv("NEON_TOKEN"),
                                    check.size = F)
   
@@ -319,7 +319,7 @@ added_domain_data <- data.frame(parentEventID = "NEON",
                                 fieldNotes = NA,
                                 eventRemarks = ifelse(!(NEON_domain_list %in% (
                                                 tick.occurrence$tck_taxonomyProcessed %>%
-                                                  left_join(tick.occurrence$tck_fielddata %>% dplyr::select(sampleID, domainID), by = "sampleID") %>%
+                                                  left_join(tick.occurrence$tck_fielddata %>% dplyr::select(sampleID, domainID), by = c("sampleID", "domainID")) %>%
                                                   dplyr::distinct(domainID) %>%
                                                   dplyr::pull(domainID)
                                               )),
@@ -336,7 +336,7 @@ added_domain_data <- data.frame(parentEventID = "NEON",
                                 nonTargetTaxa = NA,
                                 identifiedBy = tick.occurrence$tck_taxonomyProcessed %>% 
                                   left_join(tick.occurrence$tck_fielddata %>% select(sampleID, domainID),
-                                            by = "sampleID") %>%
+                                            by = c("sampleID", "domainID")) %>%
                                   group_by(domainID) %>%
                                   summarise(identifiedBy = paste(sort(unique(laboratoryName)), collapse = " | "),
                                             .groups = "drop") %>%
@@ -446,9 +446,9 @@ added_site_data <- data.frame(parentEventID = NEON_site_metadata$domain_id[site_
                               dataGeneralizations = NA,
                               informationWithheld = NA,
                               fieldNotes = NA,
-                              eventRemarks = ifelse(!(NEON_domain_list %in% (
+                              eventRemarks = ifelse(!(NEON_site_list %in% (
                                                 tick.occurrence$tck_taxonomyProcessed %>%
-                                                  left_join(tick.occurrence$tck_fielddata %>% dplyr::select(sampleID, siteID), by = "sampleID") %>%
+                                                  left_join(tick.occurrence$tck_fielddata %>% dplyr::select(sampleID, siteID), by = c("sampleID", "siteID")) %>%
                                                   dplyr::distinct(siteID) %>%
                                                   dplyr::pull(siteID)
                                               )),
@@ -465,7 +465,7 @@ added_site_data <- data.frame(parentEventID = NEON_site_metadata$domain_id[site_
                               nonTargetTaxa = NA,
                               identifiedBy = tick.occurrence$tck_taxonomyProcessed %>% 
                                 left_join(tick.occurrence$tck_fielddata %>% select(sampleID, siteID),
-                                          by = "sampleID") %>%
+                                          by = c("sampleID", "siteID")) %>%
                                 group_by(siteID) %>%
                                 summarise(identifiedBy = paste(sort(unique(laboratoryName)), collapse = " | "),
                                           .groups = "drop") %>%
@@ -512,7 +512,7 @@ NEON_plot_metadata <- unique(tick.occurrence$tck_fielddata[, c("namedLocation",
                                                                "elevation",
                                                                "elevationUncertainty")])
 
-NEON_plot_metadata <- NEON_plot_metadata %>% #There's an issue where plot JERC_081 has two elevations, causing it to be duplicated, so we'll just remove the first one
+NEON_plot_metadata <- NEON_plot_metadata %>% #There's an issue where a few plots have two recorded elevations, causing them to be duplicated, so we'll just remove the first one for each
   distinct(namedLocation, plotID, .keep_all = TRUE)
 
 added_plot_data <- data.frame(parentEventID = NEON_plot_metadata$siteID,
@@ -579,7 +579,7 @@ added_plot_data <- data.frame(parentEventID = NEON_plot_metadata$siteID,
                                                 function(x) paste(sort(unique(x)), collapse = " | ")
                                               ))),
                                               "identifiedBy is NA because there are no occurrence records for this event",
-                                              NA_character_
+                                              NA
                                             ),
                               verbatimTargetScope = "ticks | selected tick pathogens",
                               targetTaxonomicScope = "Ixodidae | Borrelia burgdorferi | Borrelia miyamotoi | Anaplasma phagocytophilum | Rickettsia rickettsii | Ehrlichia chaffeensis | Borrelia lonestari | Babesia microti | Ehrlichia ewingii | Borrelia burgdorferi sensu lato | Ehrlichia muris-like | Borrelia mayonii | Francisella tularensis | Borrelia sp. | Rickettsia parkeri | Rickettsia philipii",
