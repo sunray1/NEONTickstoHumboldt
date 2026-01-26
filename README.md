@@ -2,7 +2,7 @@
 
 This repository provides a worked example of mapping **NEON tick and tick pathogen monitoring data** to **Darwin Core** and the [Humboldt Extension for Ecological Inventories](https://eco.tdwg.org/).  
 
-The workflow was developed for the [GBIF Guide for publishing biological survey and monitoring data](https://docs.gbif.org/guide-publishing-survey-data/en/), using the **RELEASE-2025** NEON data products.
+The workflow was developed for the [GBIF Guide for publishing biological survey and monitoring data](https://docs.gbif.org/guide-publishing-survey-data/en/), using the **RELEASE-2026** NEON data products.
 
 ---
 
