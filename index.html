@@ -11,7 +11,7 @@
 
 <meta name="author" content="Chandra Earl, Kate Ingenloff" />
 
-<meta name="date" content="2026-01-26" />
+<meta name="date" content="2026-01-29" />
 
 <title>Mapping NEON Survey Monitoring Data to the Humboldt Extension for Ecological Inventories</title>
 
@@ -1504,7 +1504,7 @@ Humboldt Extension for Ecological Inventories</h1>
 <h3 class="subtitle"><a href="https://docs.gbif.org/guide-publishing-survey-data/en/">Guide for
 publishing biological survey and monitoring data to GBIF</a></h3>
 <h4 class="author">Chandra Earl, Kate Ingenloff</h4>
-<h4 class="date">2026-01-26</h4>
+<h4 class="date">2026-01-29</h4>
 
 </div>
 
@@ -1561,7 +1561,7 @@ monitoring of tick populations and tick-borne pathogens across the
 United States. Sampling is conducted only at terrestrial sites, where
 field staff survey designated plots every three to six weeks during the
 active tick season. Surveys are performed by dragging or flagging along
-the 160 m perimeter of each 40 × 40 m plot, and ticks of all life stages
+the 160 m perimeter of each 40 x 40 m plot, and ticks of all life stages
 are collected and preserved in ethanol.</p>
 </br>
 <div style="display: flex; justify-content: center; gap: 1em;">
@@ -1740,7 +1740,7 @@ temporal), the general sampling protocols, and whether absence,
 abundance, and material samples are reported.</p>
 <pre class="r"><code>NEON_project_event &lt;- data.frame(parentEventID = NA,
                                   eventID = &quot;NEON&quot;,
-                                  siteNestingDescription = &quot;46 terrestrial sites each with at least six 40×40 m plots designated for tick sampling (plots may be decommissioned and reassigned as necessary, but six plots are required for sampling) located across 19 ecoclimatic domains&quot;,
+                                  siteNestingDescription = &quot;46 terrestrial sites each with at least six 40x40 m plots designated for tick sampling (plots may be decommissioned and reassigned as necessary, but six plots are required for sampling) located across 19 ecoclimatic domains&quot;,
                                   siteCount = length(unique(tick.occurrence$tck_fielddata$plotID)),
                                   fieldNumber = NA,
                                   verbatimSiteNames = paste(sort(unique(tick.occurrence$tck_fielddata$plotID)), collapse = &quot; | &quot;),
@@ -1778,8 +1778,8 @@ abundance, and material samples are reported.</p>
                                   compilationSourceTypes = NA,
                                   samplingProtocol = &quot;Drag sampling | Flagging&quot;,
                                   protocolNames = &quot;Drag sampling | Flagging&quot;,
-                                  protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
-                                  protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
+                                  protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 x 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
+                                  protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK - Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
                                   isAbsenceReported = NA,
                                   absentTaxa = NA,
                                   isAbundanceReported = &quot;true&quot;,
@@ -1788,7 +1788,7 @@ abundance, and material samples are reported.</p>
                                   hasMaterialSamples = &quot;true&quot;,
                                   materialSampleTypes = &quot;wholeOrganism&quot;,
                                   hasVouchers = &quot;true&quot;,
-                                  voucherInstitutions = &quot;US National Tick Collection, Georgia Southern University&quot;,
+                                  voucherInstitutions = &quot;US National Tick Collection, Georgia Southern University | NEON Biorepository, Arizona State University&quot;,
                                   isLeastSpecificTargetCategoryQuantityInclusive = &quot;false&quot;,
                                   dataGeneralizations = NA,
                                   informationWithheld = NA,
@@ -1818,7 +1818,7 @@ abundance, and material samples are reported.</p>
                                   excludedHabitatScope = NA,
                                   samplingEffort = &quot;6 plots per bout, 160 m perimeter sampled per plot&quot;,
                                   isSamplingEffortReported = &quot;true&quot;,
-                                  samplingEffortProtocol = &quot;Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.&quot;,
+                                  samplingEffortProtocol = &quot;Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 x 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.&quot;,
                                   samplingEffortValue = &quot;6, 160&quot;,
                                   samplingEffortUnit = &quot;plots per bout, meters per plot circuit&quot;,
                                   samplingPerformedBy = &quot;NEON Field Staff&quot;
@@ -1839,7 +1839,7 @@ domain_idx &lt;- match(NEON_domain_list, NEON_domain_metadata$domain_id)
 
 added_domain_data &lt;- data.frame(parentEventID = &quot;NEON&quot;,
                                 eventID = NEON_domain_metadata$domain_id[domain_idx],
-                                siteNestingDescription = &quot;Each domain contains 1-3 terrestrial field sites, each with at least six 40×40 m plots designated for tick sampling (plots may be decommissioned and reassigned as necessary, but six plots are required for sampling)&quot;,
+                                siteNestingDescription = &quot;Each domain contains 1-3 terrestrial field sites, each with at least six 40x40 m plots designated for tick sampling (plots may be decommissioned and reassigned as necessary, but six plots are required for sampling)&quot;,
                                 siteCount = tapply(tick.occurrence$tck_fielddata$plotID,    #Get number of sampled plots per domain
                                                    tick.occurrence$tck_fielddata$domainID,
                                                    function(x) length(unique(x)))[NEON_domain_list],
@@ -1882,8 +1882,8 @@ added_domain_data &lt;- data.frame(parentEventID = &quot;NEON&quot;,
                                 compilationSourceTypes = NA,
                                 samplingProtocol = &quot;Drag sampling | Flagging&quot;, #Sampling protocol terms (from here up to eventRemarks) should be populated for every Event regardless of hierarchical level
                                 protocolNames = &quot;Drag sampling | Flagging&quot;,
-                                protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
-                                protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
+                                protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 x 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
+                                protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK - Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
                                 isAbsenceReported = NA,
                                 absentTaxa = NA,
                                 isAbundanceReported = &quot;true&quot;,
@@ -1892,7 +1892,7 @@ added_domain_data &lt;- data.frame(parentEventID = &quot;NEON&quot;,
                                 hasMaterialSamples = &quot;true&quot;,
                                 materialSampleTypes = &quot;wholeOrganism&quot;,
                                 hasVouchers = &quot;true&quot;,
-                                voucherInstitutions = &quot;US National Tick Collection, Georgia Southern University&quot;,
+                                voucherInstitutions = &quot;US National Tick Collection, Georgia Southern University | NEON Biorepository, Arizona State University&quot;,
                                 isLeastSpecificTargetCategoryQuantityInclusive = &quot;false&quot;,
                                 dataGeneralizations = NA,
                                 informationWithheld = NA,
@@ -1938,7 +1938,7 @@ added_domain_data &lt;- data.frame(parentEventID = &quot;NEON&quot;,
                                 excludedHabitatScope = NA,
                                 samplingEffort = &quot;6 plots per bout, 160 m perimeter sampled per plot&quot;,
                                 isSamplingEffortReported = &quot;true&quot;,
-                                samplingEffortProtocol = &quot;Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.&quot;,
+                                samplingEffortProtocol = &quot;Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 x 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.&quot;,
                                 samplingEffortValue = &quot;6, 160&quot;,
                                 samplingEffortUnit = &quot;plots per bout, meters per plot circuit&quot;,
                                 samplingPerformedBy = &quot;NEON Field Staff&quot;
@@ -1946,7 +1946,7 @@ added_domain_data &lt;- data.frame(parentEventID = &quot;NEON&quot;,
 </div>
 <div id="site-events" class="section level3 hasAnchor">
 <h3 class="hasAnchor">Site Events<a href="#site-events" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Each NEON terrestrial site contains at least six 40×40 m plots
+<p>Each NEON terrestrial site contains at least six 40x40 m plots
 designated for tick sampling. Tick sampling is conducted only at
 terrestrial sites (47 in total), but because no sampling is performed at
 PUUM in Hawai‘i (Domain 20), only 46 sites are included here. Site
@@ -1963,7 +1963,7 @@ site_idx &lt;- match(NEON_site_list, NEON_site_metadata$site_id)
 
 added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[site_idx],
                               eventID = NEON_site_metadata$site_id[site_idx],
-                              siteNestingDescription = &quot;Each site contains at least six 40×40 m plots designated for tick sampling (plots may be decommissioned and reassigned as necessary, but six plots are required for sampling)&quot;,
+                              siteNestingDescription = &quot;Each site contains at least six 40x40 m plots designated for tick sampling (plots may be decommissioned and reassigned as necessary, but six plots are required for sampling)&quot;,
                               siteCount = tapply(tick.occurrence$tck_fielddata$plotID,    #Get number of sampled plots per site
                                                  tick.occurrence$tck_fielddata$siteID,
                                                  function(x) length(unique(x)))[NEON_site_list],
@@ -2011,8 +2011,8 @@ added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[si
                               compilationSourceTypes = NA,
                               samplingProtocol = &quot;Drag sampling | Flagging&quot;, #Sampling protocol terms (from here up to eventRemarks) should be populated for every Event regardless of hierarchical level
                               protocolNames = &quot;Drag sampling | Flagging&quot;,
-                              protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
-                              protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
+                              protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 x 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
+                              protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK - Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
                               isAbsenceReported = NA,
                               absentTaxa = NA,
                               isAbundanceReported = &quot;true&quot;,
@@ -2021,7 +2021,7 @@ added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[si
                               hasMaterialSamples = &quot;true&quot;,
                               materialSampleTypes = &quot;wholeOrganism&quot;,
                               hasVouchers = &quot;true&quot;,
-                              voucherInstitutions = &quot;US National Tick Collection, Georgia Southern University&quot;,
+                              voucherInstitutions = &quot;US National Tick Collection, Georgia Southern University | NEON Biorepository, Arizona State University&quot;,
                               isLeastSpecificTargetCategoryQuantityInclusive = &quot;false&quot;,
                               dataGeneralizations = NA,
                               informationWithheld = NA,
@@ -2067,7 +2067,7 @@ added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[si
                               excludedHabitatScope = NA,
                               samplingEffort = &quot;6 plots per bout, 160 m perimeter sampled per plot&quot;,
                               isSamplingEffortReported = &quot;true&quot;,
-                              samplingEffortProtocol = &quot;Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.&quot;,
+                              samplingEffortProtocol = &quot;Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 x 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.&quot;,
                               samplingEffortValue = &quot;6, 160&quot;,
                               samplingEffortUnit = &quot;plots per bout, meters per plot circuit&quot;,
                               samplingPerformedBy = &quot;NEON Field Staff&quot;
@@ -2076,7 +2076,7 @@ added_site_data &lt;- data.frame(parentEventID = NEON_site_metadata$domain_id[si
 <div id="plot-events" class="section level3 hasAnchor">
 <h3 class="hasAnchor">Plot Events<a href="#plot-events" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Plot events represent the smallest fixed spatial unit within NEON’s
-tick monitoring design. Each plot is a 40×40 m area where drag or flag
+tick monitoring design. Each plot is a 40x40 m area where drag or flag
 sampling is carried out. Plot-level metadata include plot identifiers,
 habitat classification, and elevation.</p>
 <pre class="r"><code>NEON_plot_metadata &lt;- unique(tick.occurrence$tck_fielddata[, c(&quot;namedLocation&quot;,
@@ -2096,7 +2096,7 @@ NEON_plot_metadata &lt;- NEON_plot_metadata %&gt;% #There&#39;s an issue where a
 
 added_plot_data &lt;- data.frame(parentEventID = NEON_plot_metadata$siteID,
                               eventID = NEON_plot_metadata$plotID,
-                              siteNestingDescription = &quot;One 40×40 m plot designated for tick sampling&quot;,
+                              siteNestingDescription = &quot;One 40x40 m plot designated for tick sampling&quot;,
                               siteCount = 1,
                               fieldNumber = NA,
                               verbatimSiteNames = NEON_plot_metadata$plotID,
@@ -2137,8 +2137,8 @@ added_plot_data &lt;- data.frame(parentEventID = NEON_plot_metadata$siteID,
                               compilationSourceTypes = NA,
                               samplingProtocol = &quot;Drag sampling | Flagging&quot;, #Sampling protocol terms (from here up to eventRemarks) should be populated for every Event regardless of hierarchical level
                               protocolNames = &quot;Drag sampling | Flagging&quot;,
-                              protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
-                              protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
+                              protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 x 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
+                              protocolReferences = &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK - Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;,
                               isAbsenceReported = NA,
                               absentTaxa = NA,
                               isAbundanceReported = &quot;true&quot;,
@@ -2147,7 +2147,7 @@ added_plot_data &lt;- data.frame(parentEventID = NEON_plot_metadata$siteID,
                               hasMaterialSamples = &quot;true&quot;,
                               materialSampleTypes = &quot;wholeOrganism&quot;,
                               hasVouchers = &quot;true&quot;,
-                              voucherInstitutions = &quot;US National Tick Collection, Georgia Southern University&quot;,
+                              voucherInstitutions = &quot;US National Tick Collection, Georgia Southern University | NEON Biorepository, Arizona State University&quot;,
                               isLeastSpecificTargetCategoryQuantityInclusive = &quot;false&quot;,
                               dataGeneralizations = NA,
                               informationWithheld = NA,
@@ -2188,7 +2188,7 @@ added_plot_data &lt;- data.frame(parentEventID = NEON_plot_metadata$siteID,
                               excludedHabitatScope = NA,
                               samplingEffort = &quot;160 m perimeter sampled per bout&quot;,
                               isSamplingEffortReported = &quot;true&quot;,
-                              samplingEffortProtocol = &quot;Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.&quot;,
+                              samplingEffortProtocol = &quot;Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 x 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.&quot;,
                               samplingEffortValue = &quot;6, 160&quot;,
                               samplingEffortUnit = &quot;plots per bout, meters per plot circuit&quot;,
                               samplingPerformedBy = &quot;NEON Field Staff&quot;
@@ -2199,12 +2199,21 @@ added_plot_data &lt;- data.frame(parentEventID = NEON_plot_metadata$siteID,
 <p>Plot visit events describe the actual sampling bouts, usually every
 three to six weeks during green-up. At this level, we record specific
 sampling dates, methods, conditions, and any remarks made during
-fieldwork. Presence–absence of ticks is also recorded here: if no ticks
+fieldwork. Presence-absence of ticks is also recorded here: if no ticks
 are collected during a visit, the absence is captured at the event
 level. These events provide the link between the hierarchical survey
 design and the occurrence records derived from individual tick or
 pathogen samples.</p>
 <pre class="r"><code>NEON_plot_visit_metadata &lt;- tick.occurrence$tck_fielddata
+NEON_tick_occurrence_data &lt;- tick.occurrence$tck_taxonomyProcessed
+
+#Add identification protocol to determine voucher location
+NEON_plot_visit_metadata$identificationProtocolVersion &lt;-
+  NEON_tick_occurrence_data$identificationProtocolVersion[
+    match(NEON_plot_visit_metadata$sampleID,
+          NEON_tick_occurrence_data$sampleID)
+  ]
+
 
 added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$plotID,
                                     eventID = ifelse(is.na(NEON_plot_visit_metadata$sampleID), #eventID is the sampleID if a sample is taken, if not, we create one with the same format (plotID.date)
@@ -2256,29 +2265,39 @@ added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$
                                     compilationSourceTypes = NA,
                                     samplingProtocol = NEON_plot_visit_metadata$samplingMethod, #Sampling protocol terms (from here up to eventRemarks) should be populated for every Event regardless of hierarchical level
                                     protocolNames = NEON_plot_visit_metadata$samplingMethod,
-                                    protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 × 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
-                                    protocolReferences = paste(NEON_plot_visit_metadata$samplingProtocolVersion, &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK – Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;, sep=&quot; | &quot;),
+                                    protocolDescriptions = &quot;Ticks are sampled at six plots per site every three to six weeks, depending on prior detections. Sampling follows the 160 m perimeter of each 40 x 40 m plot, using drag cloths (or flagging in dense vegetation). Ticks from all life stages are collected every few meters and preserved in ethanol, with bouts scheduled between green-up and dormancy. Samples are sent to external labs where they are sorted, counted and a subset of identified nymphs are tested for pathogens.&quot;,
+                                    protocolReferences = paste(NEON_plot_visit_metadata$samplingProtocolVersion, &quot;Paull, S. 2022. TOS Protocol and Procedure: TCK - Tick and Tick-Borne Pathogen Sampling. NEON.DOC.014045. NEON (National Ecological Observatory Network). | Laboratory of Medical Zoology (LMZ). 2023. NEON Tick Pathogen Testing SOP, V4.01. University of Massachusetts, Amherst. | Beati, L. 2021. Tick Identification Instructions, USNTC Standard Operating Procedure (SOP). V3. Georgia Southern University, US National Tick Collection (USNTC).&quot;, sep=&quot; | &quot;),
                                     isAbsenceReported = NA,
                                     absentTaxa = NA,
-                                    isAbundanceReported = ifelse(
-                                      is.na(NEON_plot_visit_metadata$targetTaxaPresent),
-                                      &quot;false&quot;,
-                                      &quot;true&quot;
-                                    ),
+                                    isAbundanceReported = &quot;true&quot;,
                                     isAbundanceCapReported = &quot;false&quot;,
                                     abundanceCap = NA,
                                     hasMaterialSamples = ifelse(
-                                      is.na(NEON_plot_visit_metadata$targetTaxaPresent),
-                                      &quot;false&quot;,
-                                      &quot;true&quot;
+                                      !is.na(NEON_plot_visit_metadata$sampleID) &amp;
+                                        NEON_plot_visit_metadata$sampleID %in% NEON_tick_occurrence_data$sampleID,
+                                      &quot;true&quot;,
+                                      &quot;false&quot;
                                     ),
                                     materialSampleTypes = &quot;wholeOrganism&quot;,
                                     hasVouchers = ifelse(
-                                      is.na(NEON_plot_visit_metadata$targetTaxaPresent),
-                                      &quot;false&quot;,
-                                      &quot;true&quot;
+                                      !is.na(NEON_plot_visit_metadata$sampleID) &amp;
+                                        NEON_plot_visit_metadata$sampleID %in% NEON_tick_occurrence_data$sampleID,
+                                      &quot;true&quot;,
+                                      &quot;false&quot;
                                     ),
-                                    voucherInstitutions = &quot;US National Tick Collection, Georgia Southern University&quot;,
+                                    voucherInstitutions = ifelse(
+                                      is.na(NEON_plot_visit_metadata$identificationProtocolVersion),
+                                      NA,
+                                      ifelse(
+                                        grepl(&quot;^GSU&quot;, NEON_plot_visit_metadata$identificationProtocolVersion),
+                                        &quot;US National Tick Collection, Georgia Southern University&quot;,
+                                        ifelse(
+                                          grepl(&quot;^NEON&quot;, NEON_plot_visit_metadata$identificationProtocolVersion),
+                                          &quot;NEON Biorepository, Arizona State University&quot;,
+                                          NA
+                                        )
+                                      )
+                                    ),
                                     isLeastSpecificTargetCategoryQuantityInclusive = &quot;false&quot;,
                                     dataGeneralizations = NA,
                                     informationWithheld = NA,
@@ -2291,12 +2310,9 @@ added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$
                                           &quot;No survey conducted&quot;,
                                           paste(NEON_plot_visit_metadata$remarks, &quot;No survey conducted&quot;, sep = &quot;; &quot;)
                                         ),
-                                        NEON_plot_visit_metadata$remarks
-                                      )
-                                    
+                                        NEON_plot_visit_metadata$remarks)
                                       miss_id &lt;- !(tick.occurrence$tck_fielddata$sampleID %in%
                                                      tick.occurrence$tck_taxonomyProcessed$sampleID)
-                                    
                                       ifelse(
                                         miss_id,
                                         ifelse(
@@ -2345,7 +2361,7 @@ added_plot_visit_data &lt;- data.frame(parentEventID = NEON_plot_visit_metadata$
                                     excludedHabitatScope = NA,
                                     samplingEffort = &quot;160 m perimeter sampled per bout&quot;,
                                     isSamplingEffortReported = &quot;true&quot;,
-                                    samplingEffortProtocol = &quot;Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 × 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.&quot;,
+                                    samplingEffortProtocol = &quot;Ticks are sampled at six plots per site, with bouts every 3 or 6 weeks depending on intensity. Each bout consists of dragging (or flagging if needed) along the full 160 m perimeter of each 40 x 40 m plot. Ticks of all life stages are collected at intervals and preserved in ethanol.&quot;,
                                     samplingEffortValue = &quot;6, 160&quot;,
                                     samplingEffortUnit = &quot;plots per bout, meters per plot circuit&quot;,
                                     samplingPerformedBy = NEON_plot_visit_metadata$measuredBy
