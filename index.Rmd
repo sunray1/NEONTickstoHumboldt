@@ -812,7 +812,7 @@ To preserve the link between the tested specimens and the pathogens detected (or
 
 ### Tick Occurrences
 
-Tick occurrence records correspond to individual specimens collected in the field. Attributes such as scientific name, life stage, sex, preparation, and voucher institution are included where available. These records are treated as preserved specimens and are linked to vouchers curated in external collections. All ticks collected prior to 2024 were identified and archived at the U.S. National Tick Collection at Georgia Southern University and tested at the Laboratory of Medical Zoology (LMZ) at the University of Massachusetts Amherst. Currently, ticks are identified and tested at the Laboratory of Medical Zoology (LMZ) at the University of Massachusetts Amherst and archived at the NEON Biorepository at Arizona State University.
+Tick occurrence records correspond to individual specimens collected in the field. Attributes such as scientific name, life stage, sex, preparation, and voucher institution are included where available. These records are treated as preserved specimens and are linked to vouchers curated in external collections. All ticks collected prior to 2024 were identified and archived at the U.S. National Tick Collection at Georgia Southern University and tested at the Laboratory of Medical Zoology (LMZ) at the University of Massachusetts Amherst. As of 2026, ticks are identified and tested at the Laboratory of Medical Zoology (LMZ) at the University of Massachusetts Amherst and archived at the NEON Biorepository at Arizona State University.
 
 ```{r}
 NEON_tick_occurrence_data <- tick.occurrence$tck_taxonomyProcessed
