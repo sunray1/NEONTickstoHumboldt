@@ -11,7 +11,7 @@
 
 <meta name="author" content="Chandra Earl, Kate Ingenloff" />
 
-<meta name="date" content="2026-01-29" />
+<meta name="date" content="2026-02-11" />
 
 <title>Mapping NEON Survey Monitoring Data to the Humboldt Extension for Ecological Inventories</title>
 
@@ -1504,7 +1504,7 @@ Humboldt Extension for Ecological Inventories</h1>
 <h3 class="subtitle"><a href="https://docs.gbif.org/guide-publishing-survey-data/en/">Guide for
 publishing biological survey and monitoring data to GBIF</a></h3>
 <h4 class="author">Chandra Earl, Kate Ingenloff</h4>
-<h4 class="date">2026-01-29</h4>
+<h4 class="date">2026-02-11</h4>
 
 </div>
 
@@ -1676,6 +1676,14 @@ API token documentation</a>.</p>
 
 if (!dir.exists(&quot;outputs&quot;)) {
   dir.create(&quot;outputs&quot;)
+}
+
+if (!dir.exists(&quot;outputs/full&quot;)) {
+  dir.create(&quot;outputs/full&quot;)
+}
+
+if (!dir.exists(&quot;outputs/subset&quot;)) {
+  dir.create(&quot;outputs/subset&quot;)
 }
 
 if (file.exists(&quot;data/tick.pathogen.RData&quot;)) {
@@ -2411,7 +2419,7 @@ records are treated as preserved specimens and are linked to vouchers
 curated in external collections. All ticks collected prior to 2024 were
 identified and archived at the U.S. National Tick Collection at Georgia
 Southern University and tested at the Laboratory of Medical Zoology
-(LMZ) at the University of Massachusetts Amherst. Currently, ticks are
+(LMZ) at the University of Massachusetts Amherst. As of 2026, ticks are
 identified and tested at the Laboratory of Medical Zoology (LMZ) at the
 University of Massachusetts Amherst and archived at the NEON
 Biorepository at Arizona State University.</p>
@@ -2729,12 +2737,37 @@ emof_data &lt;- emof_data %&gt;% select(where(~ !all(is.na(.)))) #Remove columns
 </div>
 <div id="save-data" class="section level1 hasAnchor">
 <h1 class="hasAnchor">Save Data<a href="#save-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>The processed event and occurrence tables generated through this
-workflow are available in the project repository. <a href="https://github.com/sunray1/NEONTickstoHumboldt/tree/master/outputs">NEONTickstoHumboldt/outputs</a>.</p>
-<pre class="r"><code>write.csv(event_data, &quot;outputs/event.csv&quot;, row.names = FALSE)
-write.csv(occurrence_data, &quot;outputs/occurrence.csv&quot;, row.names = FALSE)
-write.csv(resource_relationship_data, &quot;outputs/resourceRelationship.csv&quot;, row.names = FALSE)
-write.csv(emof_data, &quot;outputs/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)</code></pre>
+<p>The full processed event and occurrence tables generated through this
+workflow are available in the project repository. <a href="https://github.com/sunray1/NEONTickstoHumboldt/tree/master/outputs/full">NEONTickstoHumboldt/outputs/full</a>.</p>
+<pre class="r"><code>write.csv(event_data, &quot;outputs/full/event.csv&quot;, row.names = FALSE)
+write.csv(occurrence_data, &quot;outputs/full/occurrence.csv&quot;, row.names = FALSE)
+write.csv(resource_relationship_data, &quot;outputs/full/resourceRelationship.csv&quot;, row.names = FALSE)
+write.csv(emof_data, &quot;outputs/full/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)</code></pre>
+<p>A subset of the data from plot SCBI_014 is also available. <a href="https://github.com/sunray1/NEONTickstoHumboldt/tree/master/outputs/subset">NEONTickstoHumboldt/outputs/subset</a></p>
+<pre class="r"><code>event_data_subset &lt;- event_data %&gt;%
+  filter(
+    grepl(&quot;SCBI_014&quot;, verbatimSiteNames)
+  )
+
+occurrence_data_subset &lt;- occurrence_data %&gt;%
+  filter(
+    grepl(&quot;SCBI_014&quot;, eventID)
+  )
+
+resource_relationship_data_subset &lt;- resource_relationship_data %&gt;%
+  filter(
+    grepl(&quot;SCBI_014&quot;, relatedResourceID)
+  )
+
+emof_data_subset &lt;- emof_data %&gt;%
+  filter(
+    grepl(&quot;SCBI_014&quot;, eventID)
+  )
+
+write.csv(event_data_subset, &quot;outputs/subset/event.csv&quot;, row.names = FALSE)
+write.csv(occurrence_data_subset, &quot;outputs/subset/occurrence.csv&quot;, row.names = FALSE)
+write.csv(resource_relationship_data_subset, &quot;outputs/subset/resourceRelationship.csv&quot;, row.names = FALSE)
+write.csv(emof_data_subset, &quot;outputs/subset/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)</code></pre>
 </div>
 
 

@@ -113,6 +113,14 @@ if (!dir.exists("outputs")) {
   dir.create("outputs")
 }
 
+if (!dir.exists("outputs/full")) {
+  dir.create("outputs/full")
+}
+
+if (!dir.exists("outputs/subset")) {
+  dir.create("outputs/subset")
+}
+
 if (file.exists("data/tick.pathogen.RData")) {
   load("data/tick.pathogen.RData")
 } else {
@@ -1147,11 +1155,40 @@ emof_data <- emof_data %>% select(where(~ !all(is.na(.)))) #Remove columns that 
 
 # Save Data
 
-The processed event and occurrence tables generated through this workflow are available in the project repository. [NEONTickstoHumboldt/outputs](https://github.com/sunray1/NEONTickstoHumboldt/tree/master/outputs).
+The full processed event and occurrence tables generated through this workflow are available in the project repository. [NEONTickstoHumboldt/outputs/full](https://github.com/sunray1/NEONTickstoHumboldt/tree/master/outputs/full).
 
 ```{r}
-write.csv(event_data, "outputs/event.csv", row.names = FALSE)
-write.csv(occurrence_data, "outputs/occurrence.csv", row.names = FALSE)
-write.csv(resource_relationship_data, "outputs/resourceRelationship.csv", row.names = FALSE)
-write.csv(emof_data, "outputs/extendedMeasurementOrFact.csv", row.names = FALSE)
+write.csv(event_data, "outputs/full/event.csv", row.names = FALSE)
+write.csv(occurrence_data, "outputs/full/occurrence.csv", row.names = FALSE)
+write.csv(resource_relationship_data, "outputs/full/resourceRelationship.csv", row.names = FALSE)
+write.csv(emof_data, "outputs/full/extendedMeasurementOrFact.csv", row.names = FALSE)
+```
+
+A subset of the data from plot SCBI_014 is also available. [NEONTickstoHumboldt/outputs/subset](https://github.com/sunray1/NEONTickstoHumboldt/tree/master/outputs/subset)
+
+```{r}
+event_data_subset <- event_data %>%
+  filter(
+    grepl("SCBI_014", verbatimSiteNames)
+  )
+
+occurrence_data_subset <- occurrence_data %>%
+  filter(
+    grepl("SCBI_014", eventID)
+  )
+
+resource_relationship_data_subset <- resource_relationship_data %>%
+  filter(
+    grepl("SCBI_014", relatedResourceID)
+  )
+
+emof_data_subset <- emof_data %>%
+  filter(
+    grepl("SCBI_014", eventID)
+  )
+
+write.csv(event_data_subset, "outputs/subset/event.csv", row.names = FALSE)
+write.csv(occurrence_data_subset, "outputs/subset/occurrence.csv", row.names = FALSE)
+write.csv(resource_relationship_data_subset, "outputs/subset/resourceRelationship.csv", row.names = FALSE)
+write.csv(emof_data_subset, "outputs/subset/extendedMeasurementOrFact.csv", row.names = FALSE)
 ```
