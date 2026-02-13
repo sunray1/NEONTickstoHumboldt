@@ -11,7 +11,7 @@
 
 <meta name="author" content="Chandra Earl, Kate Ingenloff" />
 
-<meta name="date" content="2026-02-11" />
+<meta name="date" content="2026-02-13" />
 
 <title>Mapping NEON Survey Monitoring Data to the Humboldt Extension for Ecological Inventories</title>
 
@@ -1504,7 +1504,7 @@ Humboldt Extension for Ecological Inventories</h1>
 <h3 class="subtitle"><a href="https://docs.gbif.org/guide-publishing-survey-data/en/">Guide for
 publishing biological survey and monitoring data to GBIF</a></h3>
 <h4 class="author">Chandra Earl, Kate Ingenloff</h4>
-<h4 class="date">2026-02-11</h4>
+<h4 class="date">2026-02-13</h4>
 
 </div>
 
@@ -1641,7 +1641,11 @@ data manipulation. These libraries allow automated download and
 processing of NEON data products to prepare them for mapping to Darwin
 Core and the Humboldt Extension.</p>
 <pre class="r"><code>library(neonUtilities)
-library(dplyr)</code></pre>
+library(dplyr)
+library(stringr)
+library(httr2)
+library(purrr)
+library(tibble)</code></pre>
 </div>
 <div id="download-data" class="section level1 hasAnchor">
 <h1 class="hasAnchor">Download Data<a href="#download-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
@@ -1711,6 +1715,137 @@ if (file.exists(&quot;data/tick.occurrence.RData&quot;)) {
   
   save(tick.occurrence, file = &quot;data/tick.occurrence.RData&quot;)
 }</code></pre>
+</div>
+<div id="get-catalog-numbers" class="section level2 hasAnchor">
+<h2 class="hasAnchor">Get Catalog Numbers<a href="#get-catalog-numbers" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Catalog numbers for ticks archived at the <a href="https://biorepo.neonscience.org/">NEON Biorepository</a> are not
+available through the data downloads above, so we accessed these
+directly through the <a href="https://data.neonscience.org/data-api/">NEON Data API</a>.</p>
+<div id="tick-specimens" class="section level3 hasAnchor">
+<h3 class="hasAnchor">Tick Specimens<a href="#tick-specimens" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Only a subset of ticks are currently housed at the Biorepository,
+with most specimens located at the U.S. National Tick Collection at
+Georgia Southern University; we distinguished archived specimens based
+on the identification protocol version.</p>
+<pre class="r"><code>if (file.exists(&quot;data/catalognumbers.ticks.RData&quot;)) {
+  load(&quot;data/catalognumbers.ticks.RData&quot;)
+} else {
+  sample_ids_ticks &lt;- tick.occurrence$tck_taxonomyProcessed %&gt;%
+    filter(
+      str_starts(identificationProtocolVersion, &quot;NEON&quot;),
+      !is.na(subsampleID)
+    ) %&gt;%
+    distinct(subsampleID) %&gt;%
+    pull(subsampleID)
+  
+  get_catalog_number_ticks &lt;- function(sub_id) {
+  
+    resp &lt;- tryCatch({
+  
+      request(&quot;https://data.neonscience.org/api/v0/samples/view&quot;) %&gt;%
+        req_url_query(
+          apiToken    = Sys.getenv(&quot;NEON_TOKEN&quot;),
+          sampleTag   = sub_id,
+          sampleClass = &quot;tck_identification_in.subsampleID&quot;
+        ) %&gt;%
+        req_retry(max_tries = 1) %&gt;%   # retry transient failures
+        req_timeout(30) %&gt;%
+        req_perform()
+  
+    }, error = function(e) NULL)
+  
+    if (is.null(resp)) {
+      return(tibble(subsampleID = sub_id, archiveGuid = NA_character_))
+    }
+  
+    js &lt;- resp_body_json(resp, simplifyVector = TRUE)
+  
+    guid &lt;- tryCatch(
+      js$data$sampleViews$archiveGuid,
+      error = function(e) NA_character_
+    )
+  
+    tibble(
+      subsampleID = sub_id,
+      archiveGuid = guid %||% NA_character_
+    )
+  }
+  
+  catalognumbers.ticks &lt;- map_dfr(seq_along(sample_ids_ticks), function(i) {
+    id &lt;- sample_ids_ticks[i]
+    if (i %% 100 == 0) message(&quot;Processed &quot;, i, &quot; of &quot;, length(sample_ids_ticks))
+    Sys.sleep(0.26) #rate limiting is 4 requests a second
+    get_catalog_number_ticks(id)
+  })
+  
+  catalognumbers.ticks &lt;- setNames(
+    catalognumbers.ticks$archiveGuid,
+    catalognumbers.ticks$subsampleID
+  )
+
+  save(catalognumbers.ticks, file = &quot;data/catalognumbers.ticks.RData&quot;)
+}</code></pre>
+</div>
+<div id="pathogen-extract-samples" class="section level3 hasAnchor">
+<h3 class="hasAnchor">Pathogen Extract Samples<a href="#pathogen-extract-samples" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>All remaining pathogen genomic extracts from testing are stored at
+the Biorepository. We can grab all available IDs.</p>
+<pre class="r"><code>if (file.exists(&quot;data/catalognumbers.pathogens.RData&quot;)) {
+  load(&quot;data/catalognumbers.pathogens.RData&quot;)
+} else {
+  testing_ids &lt;- tick.pathogen$tck_pathogen %&gt;%
+    filter(!is.na(testingID)) %&gt;%
+    distinct(testingID) %&gt;%
+    pull(testingID)
+  
+  get_catalog_number_pathogens &lt;- function(test_id) {
+  
+    resp &lt;- tryCatch({
+  
+      request(&quot;https://data.neonscience.org/api/v0/samples/view&quot;) %&gt;%
+        req_url_query(
+          apiToken    = Sys.getenv(&quot;NEON_TOKEN&quot;),
+          sampleTag   = test_id,
+          sampleClass = &quot;tck_pathogenresults_in.testingID&quot;
+        ) %&gt;%
+        req_retry(max_tries = 1) %&gt;%
+        req_timeout(30) %&gt;%
+        req_perform()
+  
+    }, error = function(e) NULL)
+  
+    if (is.null(resp)) {
+      return(tibble(testingID = test_id, archiveGuid = NA_character_))
+    }
+  
+    js &lt;- resp_body_json(resp, simplifyVector = TRUE)
+  
+    guid &lt;- tryCatch(
+      js$data$sampleViews$archiveGuid,
+      error = function(e) NA_character_
+    )
+  
+    tibble(
+      testingID   = test_id,
+      archiveGuid = guid %||% NA_character_
+    )
+  }
+  
+  catalognumbers.pathogens &lt;- map_dfr(seq_along(testing_ids), function(i) {
+    id &lt;- testing_ids[i]
+    if (i %% 100 == 0) message(&quot;Processed &quot;, i, &quot; of &quot;, length(testing_ids))
+    Sys.sleep(0.26) #rate limiting is 4 requests a second
+    get_catalog_number_pathogens(id)
+  })
+  
+  catalognumbers.pathogens &lt;- setNames(
+    catalognumbers.pathogens$archiveGuid,
+    catalognumbers.pathogens$testingID
+  )
+  
+  save(catalognumbers.pathogens, file = &quot;data/catalognumbers.pathogens.RData&quot;)
+}</code></pre>
+</div>
 </div>
 </div>
 <div id="map-data" class="section level1 hasAnchor">
@@ -2424,10 +2559,12 @@ identified and tested at the Laboratory of Medical Zoology (LMZ) at the
 University of Massachusetts Amherst and archived at the NEON
 Biorepository at Arizona State University.</p>
 <pre class="r"><code>NEON_tick_occurrence_data &lt;- tick.occurrence$tck_taxonomyProcessed
+NEON_tick_catalognumbers  &lt;- catalognumbers.ticks
 
 added_tick_occurrence_data &lt;- data.frame(eventID = NEON_tick_occurrence_data$sampleID,
                                          occurrenceID = NEON_tick_occurrence_data$subsampleID,
                                          basisOfRecord = &quot;PreservedSpecimen&quot;,
+                                         catalogNumber = NEON_tick_catalognumbers[NEON_tick_occurrence_data$subsampleID],
                                          scientificName = NEON_tick_occurrence_data$scientificName,
                                          scientificNameAuthorship = NEON_tick_occurrence_data$scientificNameAuthorship,
                                          taxonRank = NEON_tick_occurrence_data$taxonRank,
@@ -2495,11 +2632,14 @@ Core Resource Relationship extension.</p>
       testPathogenName != &quot;HardTick DNA Quality&quot; &amp; #Remove DNA Quality test
       !grepl(&quot;^(Ixodes|Dermacentor|Amblyomma|Haemaphysalis)&quot;, testPathogenName) #Remove molecular identification tests
   )
+NEON_pathogens_catalognumbers  &lt;- catalognumbers.pathogens
+
 
 added_pathogen_occurrence_data &lt;- data.frame(eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID, &quot;\\.&quot;), 
                                                               function(x) paste(x[1:2], collapse = &quot;.&quot;)),
                                              occurrenceID = NEON_pathogen_occurrence_data$uid,
                                              basisOfRecord = &quot;MaterialSample&quot;,
+                                             catalogNumber = NEON_pathogens_catalognumbers[NEON_pathogen_occurrence_data$testingID],
                                              scientificName = NEON_pathogen_occurrence_data$testPathogenName,
                                              taxonRank = NA,
                                              kingdom = c(&quot;Borrelia burgdorferi&quot; = &quot;Bacteria&quot;,
@@ -2554,7 +2694,7 @@ added_pathogen_occurrence_data &lt;- data.frame(eventID = sapply(strsplit(NEON_p
                                              identifiedBy = paste(NEON_pathogen_occurrence_data$testedBy, NEON_pathogen_occurrence_data$laboratoryName, sep=&quot;, &quot;),
                                              dateIdentified = NEON_pathogen_occurrence_data$testedDate,
                                              materialSampleID = NEON_pathogen_occurrence_data$testingID,
-                                             materialEntityRemarks = &quot;materialSampleID corresponds to the NEON testingID, which uniquely identifies the individual tick nymph(s) tested.&quot;
+                                             materialEntityRemarks = &quot;materialSampleID corresponds to the NEON testingID, which uniquely identifies the group of specimens for testing. The remaining genomic extracts are archived with corresponding catalogNumber.&quot;
                                    )</code></pre>
 </div>
 <div id="merge-occurrence-tables" class="section level3 hasAnchor">
