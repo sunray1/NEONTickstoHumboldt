@@ -91,6 +91,10 @@ The code examples in this document use R functions provided by the `neonUtilitie
 ```{r message=FALSE, warning=FALSE}
 library(neonUtilities)
 library(dplyr)
+library(stringr)
+library(httr2)
+library(purrr)
+library(tibble)
 ```
 
 # Download Data
@@ -145,6 +149,138 @@ if (file.exists("data/tick.occurrence.RData")) {
                                    check.size = F)
   
   save(tick.occurrence, file = "data/tick.occurrence.RData")
+}
+
+```
+
+## Get Catalog Numbers
+
+Catalog numbers for ticks archived at the [NEON Biorepository](https://biorepo.neonscience.org/) are not available through the data downloads above, so we accessed these directly through the [NEON Data API](https://data.neonscience.org/data-api/).
+
+### Tick Specimens
+
+Only a subset of ticks are currently housed at the Biorepository, with most specimens located at the U.S. National Tick Collection at Georgia Southern University; we distinguished archived specimens based on the identification protocol version.
+
+```{r}
+if (file.exists("data/catalognumbers.ticks.RData")) {
+  load("data/catalognumbers.ticks.RData")
+} else {
+  sample_ids_ticks <- tick.occurrence$tck_taxonomyProcessed %>%
+    filter(
+      str_starts(identificationProtocolVersion, "NEON"),
+      !is.na(subsampleID)
+    ) %>%
+    distinct(subsampleID) %>%
+    pull(subsampleID)
+  
+  get_catalog_number_ticks <- function(sub_id) {
+  
+    resp <- tryCatch({
+  
+      request("https://data.neonscience.org/api/v0/samples/view") %>%
+        req_url_query(
+          apiToken    = Sys.getenv("NEON_TOKEN"),
+          sampleTag   = sub_id,
+          sampleClass = "tck_identification_in.subsampleID"
+        ) %>%
+        req_retry(max_tries = 1) %>%   # retry transient failures
+        req_timeout(30) %>%
+        req_perform()
+  
+    }, error = function(e) NULL)
+  
+    if (is.null(resp)) {
+      return(tibble(subsampleID = sub_id, archiveGuid = NA_character_))
+    }
+  
+    js <- resp_body_json(resp, simplifyVector = TRUE)
+  
+    guid <- tryCatch(
+      js$data$sampleViews$archiveGuid,
+      error = function(e) NA_character_
+    )
+  
+    tibble(
+      subsampleID = sub_id,
+      archiveGuid = guid %||% NA_character_
+    )
+  }
+  
+  catalognumbers.ticks <- map_dfr(seq_along(sample_ids_ticks), function(i) {
+    id <- sample_ids_ticks[i]
+    if (i %% 100 == 0) message("Processed ", i, " of ", length(sample_ids_ticks))
+    Sys.sleep(0.26) #rate limiting is 4 requests a second
+    get_catalog_number_ticks(id)
+  })
+  
+  catalognumbers.ticks <- setNames(
+    catalognumbers.ticks$archiveGuid,
+    catalognumbers.ticks$subsampleID
+  )
+
+  save(catalognumbers.ticks, file = "data/catalognumbers.ticks.RData")
+}
+```
+
+### Pathogen Extract Samples
+
+All remaining pathogen genomic extracts from testing are stored at the Biorepository. We can grab all available IDs. 
+
+```{r}
+if (file.exists("data/catalognumbers.pathogens.RData")) {
+  load("data/catalognumbers.pathogens.RData")
+} else {
+  testing_ids <- tick.pathogen$tck_pathogen %>%
+    filter(!is.na(testingID)) %>%
+    distinct(testingID) %>%
+    pull(testingID)
+  
+  get_catalog_number_pathogens <- function(test_id) {
+  
+    resp <- tryCatch({
+  
+      request("https://data.neonscience.org/api/v0/samples/view") %>%
+        req_url_query(
+          apiToken    = Sys.getenv("NEON_TOKEN"),
+          sampleTag   = test_id,
+          sampleClass = "tck_pathogenresults_in.testingID"
+        ) %>%
+        req_retry(max_tries = 1) %>%
+        req_timeout(30) %>%
+        req_perform()
+  
+    }, error = function(e) NULL)
+  
+    if (is.null(resp)) {
+      return(tibble(testingID = test_id, archiveGuid = NA_character_))
+    }
+  
+    js <- resp_body_json(resp, simplifyVector = TRUE)
+  
+    guid <- tryCatch(
+      js$data$sampleViews$archiveGuid,
+      error = function(e) NA_character_
+    )
+  
+    tibble(
+      testingID   = test_id,
+      archiveGuid = guid %||% NA_character_
+    )
+  }
+  
+  catalognumbers.pathogens <- map_dfr(seq_along(testing_ids), function(i) {
+    id <- testing_ids[i]
+    if (i %% 100 == 0) message("Processed ", i, " of ", length(testing_ids))
+    Sys.sleep(0.26) #rate limiting is 4 requests a second
+    get_catalog_number_pathogens(id)
+  })
+  
+  catalognumbers.pathogens <- setNames(
+    catalognumbers.pathogens$archiveGuid,
+    catalognumbers.pathogens$testingID
+  )
+  
+  save(catalognumbers.pathogens, file = "data/catalognumbers.pathogens.RData")
 }
 
 ```
@@ -824,10 +960,12 @@ Tick occurrence records correspond to individual specimens collected in the fiel
 
 ```{r}
 NEON_tick_occurrence_data <- tick.occurrence$tck_taxonomyProcessed
+NEON_tick_catalognumbers  <- catalognumbers.ticks
 
 added_tick_occurrence_data <- data.frame(eventID = NEON_tick_occurrence_data$sampleID,
                                          occurrenceID = NEON_tick_occurrence_data$subsampleID,
                                          basisOfRecord = "PreservedSpecimen",
+                                         catalogNumber = NEON_tick_catalognumbers[NEON_tick_occurrence_data$subsampleID],
                                          scientificName = NEON_tick_occurrence_data$scientificName,
                                          scientificNameAuthorship = NEON_tick_occurrence_data$scientificNameAuthorship,
                                          taxonRank = NEON_tick_occurrence_data$taxonRank,
@@ -894,11 +1032,14 @@ NEON_pathogen_occurrence_data <- tick.pathogen$tck_pathogen %>%
       testPathogenName != "HardTick DNA Quality" & #Remove DNA Quality test
       !grepl("^(Ixodes|Dermacentor|Amblyomma|Haemaphysalis)", testPathogenName) #Remove molecular identification tests
   )
+NEON_pathogens_catalognumbers  <- catalognumbers.pathogens
+
 
 added_pathogen_occurrence_data <- data.frame(eventID = sapply(strsplit(NEON_pathogen_occurrence_data$subsampleID, "\\."), 
                                                               function(x) paste(x[1:2], collapse = ".")),
                                              occurrenceID = NEON_pathogen_occurrence_data$uid,
                                              basisOfRecord = "MaterialSample",
+                                             catalogNumber = NEON_pathogens_catalognumbers[NEON_pathogen_occurrence_data$testingID],
                                              scientificName = NEON_pathogen_occurrence_data$testPathogenName,
                                              taxonRank = NA,
                                              kingdom = c("Borrelia burgdorferi" = "Bacteria",
@@ -953,7 +1094,7 @@ added_pathogen_occurrence_data <- data.frame(eventID = sapply(strsplit(NEON_path
                                              identifiedBy = paste(NEON_pathogen_occurrence_data$testedBy, NEON_pathogen_occurrence_data$laboratoryName, sep=", "),
                                              dateIdentified = NEON_pathogen_occurrence_data$testedDate,
                                              materialSampleID = NEON_pathogen_occurrence_data$testingID,
-                                             materialEntityRemarks = "materialSampleID corresponds to the NEON testingID, which uniquely identifies the individual tick nymph(s) tested."
+                                             materialEntityRemarks = "materialSampleID corresponds to the NEON testingID, which uniquely identifies the group of specimens for testing. The remaining genomic extracts are archived with corresponding catalogNumber."
                                    )
 ```
 
