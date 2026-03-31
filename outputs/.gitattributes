@@ -1,0 +1,6 @@
+zipped/event.csv filter=lfs diff=lfs merge=lfs -text
+zipped/extendedMeasurementOrFact.csv filter=lfs diff=lfs merge=lfs -text
+zipped/humboldtecologicalinventory.csv filter=lfs diff=lfs merge=lfs -text
+zipped/meta.xml filter=lfs diff=lfs merge=lfs -text
+zipped/occurrence.csv filter=lfs diff=lfs merge=lfs -text
+zipped/resourceRelationship.csv filter=lfs diff=lfs merge=lfs -text
