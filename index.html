@@ -1545,9 +1545,9 @@ document.addEventListener("DOMContentLoaded", function() {
 for publishing biological survey and monitoring data to GBIF</a> to
 illustrate how data from the <a href="https://www.neonscience.org/">National Ecological Observatory
 Network (NEON)</a> can be expressed using Darwin Core and the <a href="https://eco.tdwg.org/">Humboldt Extension for Ecological
-Inventories</a>. The workflow produces the four core Darwin Core tables
-used for publishing survey datasets to GBIF: Event, Occurrence,
-ResourceRelationship, and ExtendedMeasurementOrFact.<br />
+Inventories</a>. The workflow produces five Darwin Core tables: Event,
+HumboldtEcologicalInventory, Occurrence, ResourceRelationship, and
+ExtendedMeasurementOrFact.<br />
 The dataset is structured hierarchically, with events defined at
 multiple levels (project, domain, site, plot, and plot visit).
 Occurrences represent collected ticks as well as subsequent laboratory
@@ -2266,8 +2266,8 @@ NEON_plot_metadata &lt;- NEON_plot_metadata %&gt;% #There&#39;s an issue where a
                                     coordinateUncertaintyInMeters = NEON_plot_metadata$coordinateUncertainty,
                                     geodeticDatum = &quot;WGS84&quot;,
                                     locality = NEON_plot_metadata$plotID,
-                                    minimumElevationinMeters = NEON_plot_metadata$elevation - NEON_plot_metadata$elevationUncertainty,
-                                    maximumElevationinMeters = NEON_plot_metadata$elevation + NEON_plot_metadata$elevationUncertainty,
+                                    minimumElevationInMeters = NEON_plot_metadata$elevation - NEON_plot_metadata$elevationUncertainty,
+                                    maximumElevationInMeters = NEON_plot_metadata$elevation + NEON_plot_metadata$elevationUncertainty,
                                     verbatimElevation = paste(NEON_plot_metadata$elevation, &quot;m&quot;, sep=&quot;&quot;),
                                     sampleSizeValue = 40 * 4,
                                     sampleSizeUnit = &quot;m&quot;,
@@ -2395,8 +2395,8 @@ NEON_plot_visit_metadata$identificationProtocolVersion &lt;-
                                           coordinateUncertaintyInMeters = NEON_plot_visit_metadata$coordinateUncertainty,
                                           geodeticDatum = &quot;WGS84&quot;,
                                           locality = NEON_plot_visit_metadata$plotID,
-                                          minimumElevationinMeters = NEON_plot_visit_metadata$elevation - NEON_plot_visit_metadata$elevationUncertainty,
-                                          maximumElevationinMeters = NEON_plot_visit_metadata$elevation + NEON_plot_visit_metadata$elevationUncertainty,
+                                          minimumElevationInMeters = NEON_plot_visit_metadata$elevation - NEON_plot_visit_metadata$elevationUncertainty,
+                                          maximumElevationInMeters = NEON_plot_visit_metadata$elevation + NEON_plot_visit_metadata$elevationUncertainty,
                                           verbatimElevation = paste(NEON_plot_visit_metadata$elevation, &quot;m&quot;, sep=&quot;&quot;),
                                           sampleSizeValue = NEON_plot_visit_metadata$totalSampledArea,
                                           sampleSizeUnit = ifelse(
@@ -2917,6 +2917,8 @@ emof_data &lt;- emof_data %&gt;% select(where(~ !all(is.na(.)))) #Remove columns
 </div>
 <div id="save-data" class="section level1 hasAnchor">
 <h1 class="hasAnchor">Save Data<a href="#save-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="full-dataset" class="section level2 hasAnchor">
+<h2 class="hasAnchor">Full Dataset<a href="#full-dataset" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The full processed event and occurrence tables generated through this
 workflow are available in the project repository. <a href="https://github.com/sunray1/NEONTickstoHumboldt/tree/master/outputs/full">NEONTickstoHumboldt/outputs/full</a>.</p>
 <pre class="r"><code>write.csv(event_data_core, &quot;outputs/full/event.csv&quot;, row.names = FALSE)
@@ -2924,6 +2926,9 @@ write.csv(event_data_humboldt, &quot;outputs/full/humboldtecologicalinventory.cs
 write.csv(occurrence_data, &quot;outputs/full/occurrence.csv&quot;, row.names = FALSE)
 write.csv(resource_relationship_data, &quot;outputs/full/resourceRelationship.csv&quot;, row.names = FALSE)
 write.csv(emof_data, &quot;outputs/full/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)</code></pre>
+</div>
+<div id="subsetted-dataset" class="section level2 hasAnchor">
+<h2 class="hasAnchor">Subsetted Dataset<a href="#subsetted-dataset" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>A subset of the data from plot SCBI_014 is also available. <a href="https://github.com/sunray1/NEONTickstoHumboldt/tree/master/outputs/subset">NEONTickstoHumboldt/outputs/subset</a></p>
 <pre class="r"><code>event_data_humboldt_subset &lt;- event_data_humboldt %&gt;%
   filter(
@@ -2953,6 +2958,593 @@ write.csv(event_data_humboldt_subset, &quot;outputs/subset/humboldtecologicalinv
 write.csv(occurrence_data_subset, &quot;outputs/subset/occurrence.csv&quot;, row.names = FALSE)
 write.csv(resource_relationship_data_subset, &quot;outputs/subset/resourceRelationship.csv&quot;, row.names = FALSE)
 write.csv(emof_data_subset, &quot;outputs/subset/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)</code></pre>
+</div>
+<div id="zipped-dwc-a" class="section level2 hasAnchor">
+<h2 class="hasAnchor">Zipped DwC-A<a href="#zipped-dwc-a" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We also save the full dataset as a DwC-A for publishing.</p>
+<p>Write data files:</p>
+<pre class="r"><code>write.csv(event_data_core, &quot;outputs/zipped/event.csv&quot;, row.names = FALSE)
+write.csv(event_data_humboldt, &quot;outputs/zipped/humboldtecologicalinventory.csv&quot;, row.names = FALSE)
+write.csv(occurrence_data, &quot;outputs/zipped/occurrence.csv&quot;, row.names = FALSE)
+write.csv(resource_relationship_data, &quot;outputs/zipped/resourceRelationship.csv&quot;, row.names = FALSE)
+write.csv(emof_data, &quot;outputs/zipped/extendedMeasurementOrFact.csv&quot;, row.names = FALSE)</code></pre>
+<p>Create meta.xml files (the file describing the structure of the
+data):</p>
+<pre class="r"><code># function to create fields
+make_fields_xml &lt;- function(df, prefix) {
+  paste0(
+    &#39;    &lt;field index=&quot;&#39;, seq_along(colnames(df))[-1] - 1,
+    &#39;&quot; term=&quot;&#39;, paste0(prefix, colnames(df)[-1]), &#39;&quot;/&gt;&#39;,
+    collapse = &quot;\n&quot;
+  )
+}
+
+# Event Core
+core_xml &lt;- paste0(
+&#39;&lt;core encoding=&quot;UTF-8&quot; fieldsTerminatedBy=&quot;,&quot; linesTerminatedBy=&quot;\\n&quot; 
+       fieldsEnclosedBy=&quot;&amp;quot;&quot; ignoreHeaderLines=&quot;1&quot;
+       rowType=&quot;http://rs.tdwg.org/dwc/terms/Event&quot;&gt;
+
+  &lt;files&gt;
+    &lt;location&gt;event.csv&lt;/location&gt;
+  &lt;/files&gt;
+
+  &lt;id index=&quot;0&quot;/&gt;\n&#39;,
+make_fields_xml(event_data_core, &quot;http://rs.tdwg.org/dwc/terms/&quot;),
+&#39;\n&lt;/core&gt;\n&#39;
+)
+
+# Humboldt Extension
+humboldt_xml &lt;- paste0(
+&#39;&lt;extension encoding=&quot;UTF-8&quot; fieldsTerminatedBy=&quot;,&quot; linesTerminatedBy=&quot;\\n&quot; 
+           fieldsEnclosedBy=&quot;&amp;quot;&quot; ignoreHeaderLines=&quot;1&quot;
+           rowType=&quot;http://rs.tdwg.org/eco/terms/Event&quot;&gt;
+
+  &lt;files&gt;
+    &lt;location&gt;humboldtecologicalinventory.csv&lt;/location&gt;
+  &lt;/files&gt;
+
+  &lt;coreid index=&quot;0&quot;/&gt;\n&#39;,
+make_fields_xml(event_data_humboldt, &quot;http://rs.tdwg.org/eco/terms/&quot;),
+&#39;\n&lt;/extension&gt;\n&#39;
+)
+
+# Occurrence Extension
+occ_xml &lt;- paste0(
+&#39;&lt;extension encoding=&quot;UTF-8&quot; fieldsTerminatedBy=&quot;,&quot; linesTerminatedBy=&quot;\\n&quot; 
+           fieldsEnclosedBy=&quot;&amp;quot;&quot; ignoreHeaderLines=&quot;1&quot;
+           rowType=&quot;http://rs.tdwg.org/dwc/terms/Occurrence&quot;&gt;
+
+  &lt;files&gt;
+    &lt;location&gt;occurrence.csv&lt;/location&gt;
+  &lt;/files&gt;
+
+  &lt;coreid index=&quot;0&quot;/&gt;\n&#39;,
+make_fields_xml(occurrence_data, &quot;http://rs.tdwg.org/dwc/terms/&quot;),
+&#39;\n&lt;/extension&gt;\n&#39;
+)
+
+# ResourceRelationship Extension
+rr_xml &lt;- paste0(
+&#39;&lt;extension encoding=&quot;UTF-8&quot; fieldsTerminatedBy=&quot;,&quot; linesTerminatedBy=&quot;\\n&quot; 
+           fieldsEnclosedBy=&quot;&amp;quot;&quot; ignoreHeaderLines=&quot;1&quot;
+           rowType=&quot;http://rs.tdwg.org/terms/1.0/ResourceRelationship&quot;&gt;
+
+  &lt;files&gt;
+    &lt;location&gt;resourceRelationship.csv&lt;/location&gt;
+  &lt;/files&gt;
+
+  &lt;coreid index=&quot;0&quot;/&gt;\n&#39;,
+make_fields_xml(resource_relationship_data, &quot;http://rs.tdwg.org/dwc/terms/&quot;),
+&#39;\n&lt;/extension&gt;\n&#39;
+)
+
+# extendedMeasurementOrFact Extension
+emof_xml &lt;- paste0(
+&#39;&lt;extension encoding=&quot;UTF-8&quot; fieldsTerminatedBy=&quot;,&quot; linesTerminatedBy=&quot;\\n&quot; 
+           fieldsEnclosedBy=&quot;&amp;quot;&quot; ignoreHeaderLines=&quot;1&quot;
+           rowType=&quot;http://rs.tdwg.org/dwc/terms/MeasurementOrFact&quot;&gt;
+
+  &lt;files&gt;
+    &lt;location&gt;extendedMeasurementOrFact.csv&lt;/location&gt;
+  &lt;/files&gt;
+
+  &lt;coreid index=&quot;0&quot;/&gt;\n&#39;,
+make_fields_xml(emof_data, &quot;http://rs.tdwg.org/dwc/terms/&quot;),
+&#39;\n&lt;/extension&gt;\n&#39;
+)
+
+# Put everything together
+meta_xml &lt;- paste0(
+&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;archive xmlns=&quot;http://rs.tdwg.org/dwc/text/&quot; metadata=&quot;eml.xml&quot;&gt;
+
+&#39;,
+core_xml,
+humboldt_xml,
+occ_xml,
+rr_xml,
+emof_xml,
+&#39;&lt;/archive&gt;&#39;
+)
+
+writeLines(meta_xml, &quot;outputs/zipped/meta.xml&quot;)</code></pre>
+<p>Create eml.xml files (dataset metadata file):</p>
+<pre class="r"><code>library(uuid)
+package_id &lt;- paste0(UUIDgenerate())
+
+alternate_id_block &lt;- paste0(
+&#39;    &lt;alternateIdentifier&gt;10.15468/b52b9z&lt;/alternateIdentifier&gt;\n&#39;,
+&#39;    &lt;alternateIdentifier&gt;12315bb8-8ab3-446a-b5a4-2be93aade242&lt;/alternateIdentifier&gt;\n&#39;
+)
+
+title &lt;- &quot;NEON ticks sampled using drag cloths and tick pathogen status&quot;
+pub_date &lt;- Sys.Date()
+language &lt;- &quot;eng&quot;
+
+creator_block &lt;- paste0(
+&#39;    &lt;creator id=&quot;5b77bf2d-3bb2-4cb3-9f9d-50c20357f4cb&quot;&gt;
+      &lt;organizationName&gt;NEON Biorepository Portal&lt;/organizationName&gt;
+      &lt;electronicMailAddress&gt;biorepo@asu.edu&lt;/electronicMailAddress&gt;
+    &lt;/creator&gt;\n&#39;
+)
+
+metadata_provider_block &lt;- paste0(
+&#39;    &lt;metadataProvider&gt;
+      &lt;organizationName&gt;NEON Biorepository Portal&lt;/organizationName&gt;
+      &lt;electronicMailAddress&gt;biorepo@asu.edu&lt;/electronicMailAddress&gt;
+    &lt;/metadataProvider&gt;\n&#39;
+)
+
+abstract_text &lt;- paste(
+  &quot;This dataset contains tick survey data collected by the U.S. National Ecological Observatory Network (NEON) across terrestrial sites in the United States as part of a long-term ecological monitoring program.&quot;,
+  &quot;Ticks are sampled at standardized plots every three to six weeks during the active season using drag and flag methods along the 160 m perimeter of 40 × 40 m plots. Specimens from all life stages are collected, preserved in ethanol, and identified to species, life stage, and sex where possible.&quot;,
+  &quot;A subset of ticks is tested for pathogens of public health and veterinary importance, including Borrelia, Anaplasma, Babesia, Ehrlichia, and Rickettsia species. Pathogen test results are represented as linked records derived from individual tick specimens.&quot;,
+  &quot;The dataset is structured as a hierarchical survey using the Darwin Core Event Core and the Humboldt Extension for Ecological Inventories, with events defined at project, domain, site, plot, and sampling visit levels. Occurrence records represent both collected tick specimens and laboratory-derived pathogen observations, and are linked through ResourceRelationship records.&quot;,
+  &quot;For additional details, see https://data.neonscience.org/data-products/DP1.10093.001 and https://data.neonscience.org/data-products/DP1.10092.001.&quot;
+)
+
+abstract_block &lt;- paste0(
+&#39;    &lt;abstract&gt;
+      &lt;para&gt;&#39;, abstract_text, &#39;&lt;/para&gt;
+    &lt;/abstract&gt;\n&#39;
+)
+
+contact_block &lt;- paste0(
+&#39;    &lt;contact&gt;
+      &lt;individualName&gt;
+          &lt;givenName&gt;Chandra&lt;/givenName&gt;
+          &lt;surName&gt;Earl&lt;/surName&gt;
+      &lt;/individualName&gt;
+      &lt;organizationName&gt;National Ecological Observatory Network Biorepository&lt;/organizationName&gt;
+      &lt;positionName&gt;Biodiversity Informatician&lt;/positionName&gt;
+      &lt;address&gt;
+        &lt;deliveryPoint&gt;734 W. Alameda Drive Suite 158, DC 4108&lt;/deliveryPoint&gt;
+        &lt;city&gt;Tempe&lt;/city&gt;
+        &lt;administrativeArea&gt;AZ&lt;/administrativeArea&gt;
+        &lt;postalCode&gt;85282&lt;/postalCode&gt;
+        &lt;country&gt;US&lt;/country&gt;
+      &lt;/address&gt;
+      &lt;electronicMailAddress&gt;biorepo@asu.edu&lt;/electronicMailAddress&gt;
+    &lt;/contact&gt;\n&#39;
+)
+
+methods_block &lt;- paste0(
+&#39;    &lt;methods&gt;
+
+      &lt;methodStep&gt;
+        &lt;description&gt;
+          &lt;para&gt;
+            Data were compiled from the National Ecological Observatory Network (NEON) data portal and associated biorepository resources. Source data included field sampling records, taxonomic identifications, and pathogen testing results. Additional domain- and site-level metadata were obtained from NEON geospatial products and the NEON API, including domain boundary shapefiles and site metadata downloads.
+          &lt;/para&gt;
+        &lt;/description&gt;
+      &lt;/methodStep&gt;
+
+      &lt;methodStep&gt;
+        &lt;description&gt;
+          &lt;para&gt;
+            Event-level data were constructed to represent a hierarchical sampling design, with events defined at project, domain, site, plot, and sampling visit levels. Event records were generated by combining NEON metadata with field sampling data and aggregating temporal information to define eventDate ranges at each level.
+          &lt;/para&gt;
+        &lt;/description&gt;
+      &lt;/methodStep&gt;
+
+      &lt;sampling&gt;
+
+        &lt;studyExtent&gt;
+          &lt;description&gt;
+            &lt;para&gt;
+              This dataset includes observations from NEON terrestrial field sites distributed across multiple ecoclimatic domains in the United States, including Alaska and Puerto Rico. Sampling occurs at fixed plots within each site as part of NEON’s long-term ecological monitoring program.
+            &lt;/para&gt;
+          &lt;/description&gt;
+        &lt;/studyExtent&gt;
+
+        &lt;samplingDescription&gt;
+          &lt;para&gt;
+            Ticks are collected using standardized drag and/or flag sampling methods along the perimeter of 40 m × 40 m plots. Multiple plots are sampled at each site at regular intervals during the growing season. Samples are preserved in ethanol and processed by external laboratories, where ticks are enumerated and identified to species, life stage, and sex where possible. A subset of specimens is tested for pathogens.
+          &lt;/para&gt;
+        &lt;/samplingDescription&gt;
+
+      &lt;/sampling&gt;
+
+      &lt;methodStep&gt;
+        &lt;description&gt;
+          &lt;para&gt;
+            The dataset is structured as a hierarchical survey using the Darwin Core Event Core, with events defined at project, domain, site, plot, and sampling visit levels. Event-level data were split into two components: a Darwin Core Event Core table and a Humboldt Extension table describing ecological inventory context, including sampling effort, taxonomic scope, and protocol details.
+          &lt;/para&gt;
+        &lt;/description&gt;
+      &lt;/methodStep&gt;
+
+      &lt;methodStep&gt;
+        &lt;description&gt;
+          &lt;para&gt;
+            Occurrence records include both physical tick specimens and derived pathogen observations. Pathogen detections are represented as separate occurrence records and are linked to their source specimens using the ResourceRelationship extension. Additional contextual data, including plot characteristics, tick counts by life stage, sample identifiers, and laboratory metadata, were mapped to the Extended Measurement or Fact (eMoF) extension. All data were formatted according to Darwin Core standards for publication as a Darwin Core Archive.
+          &lt;/para&gt;
+        &lt;/description&gt;
+      &lt;/methodStep&gt;
+
+      &lt;qualityControl&gt;
+        &lt;description&gt;
+          &lt;para&gt;
+            Quality control procedures were implemented during data collection, ingestion, and processing within NEON systems. Data values were validated through controlled vocabularies and standardized formats, and additional transformations were applied during dataset preparation to ensure consistency, completeness, and correct linkage between events, occurrences, and derived records.
+          &lt;/para&gt;
+        &lt;/description&gt;
+      &lt;/qualityControl&gt;
+
+    &lt;/methods&gt;\n&#39;
+)
+
+rights_block &lt;- paste0(
+&#39;    &lt;intellectualRights&gt;
+      &lt;para&gt;
+        To the extent possible under law, the publisher has waived all rights to these data 
+        and has dedicated them to the 
+        &lt;ulink url=&quot;https://creativecommons.org/publicdomain/zero/1.0/&quot;&gt;
+          &lt;citetitle&gt;Public Domain (CC0 1.0)&lt;/citetitle&gt;
+        &lt;/ulink&gt;
+      &lt;/para&gt;
+    &lt;/intellectualRights&gt;\n&#39;
+)
+
+maintenance_block &lt;- paste0(
+&#39;    &lt;maintenance&gt;
+      &lt;description&gt;
+        &lt;para&gt;NEON datasets are updated annually upon the yearly release&lt;/para&gt;
+      &lt;/description&gt;
+      &lt;maintenanceUpdateFrequency&gt;annually&lt;/maintenanceUpdateFrequency&gt;
+    &lt;/maintenance&gt;\n&#39;
+)
+
+end_date &lt;- max(as.Date(event_data_core$eventDate), na.rm = TRUE)
+
+coverage_block &lt;- paste0(
+&#39;    &lt;coverage&gt;
+
+      &lt;geographicCoverage&gt;
+        &lt;geographicDescription&gt;
+          Data are collected at 46 terrestrial NEON sites across the United States including Alaska and Puerto Rico, but excluding Hawaii.
+        &lt;/geographicDescription&gt;
+        &lt;boundingCoordinates&gt;
+          &lt;westBoundingCoordinate&gt;-168.75&lt;/westBoundingCoordinate&gt;
+          &lt;eastBoundingCoordinate&gt;-65.391&lt;/eastBoundingCoordinate&gt;
+          &lt;northBoundingCoordinate&gt;71.301&lt;/northBoundingCoordinate&gt;
+          &lt;southBoundingCoordinate&gt;15.623&lt;/southBoundingCoordinate&gt;
+        &lt;/boundingCoordinates&gt;
+      &lt;/geographicCoverage&gt;
+
+      &lt;temporalCoverage&gt;
+        &lt;rangeOfDates&gt;
+          &lt;beginDate&gt;
+            &lt;calendarDate&gt;2014-04-02&lt;/calendarDate&gt;
+          &lt;/beginDate&gt;
+          &lt;endDate&gt;
+            &lt;calendarDate&gt;&#39;, end_date, &#39;&lt;/calendarDate&gt;
+          &lt;/endDate&gt;
+        &lt;/rangeOfDates&gt;
+      &lt;/temporalCoverage&gt;
+
+      &lt;taxonomicCoverage&gt;
+        &lt;generalTaxonomicCoverage&gt;
+          This dataset covers hard ticks collected using the drag/flag method including: Ixodes pacificus, Amblyomma americanum, Amblyomma maculatum, Dermacentor andersoni, Dermacentor occidentalis, Dermacentor variabilis, Haemaphysalis leporispalustris, Haemaphysalis longicornis, Ixodes affinis, Ixodes angustus, Ixodes dentatus, Ixodes marxi, Ixodes muris, and Ixodes scapularis. This dataset also covers testing results for several tick-borne pathogens including: Anaplasma phagocytophilum, Babesia microti, Borrelia burgdorferi sensu lato, Borrelia lonestari, Borrelia mayonii, Borrelia myamotoi, Ehrlichia chaffeensis, Ehrlichia ewingii, Ehrlichia muris-like, Francisella tularensis, and Rickettsia rickettsii.
+        &lt;/generalTaxonomicCoverage&gt;
+
+        &lt;taxonomicClassification&gt;
+          &lt;taxonRankName&gt;Family&lt;/taxonRankName&gt;
+          &lt;taxonRankValue&gt;Ixodidae&lt;/taxonRankValue&gt;
+          &lt;commonName&gt;hard ticks&lt;/commonName&gt;
+        &lt;/taxonomicClassification&gt;
+
+        &lt;taxonomicClassification&gt;
+          &lt;taxonRankName&gt;Genus&lt;/taxonRankName&gt;
+          &lt;taxonRankValue&gt;Ixodes sp.&lt;/taxonRankValue&gt;
+        &lt;/taxonomicClassification&gt;
+
+        &lt;taxonomicClassification&gt;
+          &lt;taxonRankName&gt;Genus&lt;/taxonRankName&gt;
+          &lt;taxonRankValue&gt;Dermacentor sp.&lt;/taxonRankValue&gt;
+        &lt;/taxonomicClassification&gt;
+
+        &lt;taxonomicClassification&gt;
+          &lt;taxonRankName&gt;Genus&lt;/taxonRankName&gt;
+          &lt;taxonRankValue&gt;Haemaphysalis sp.&lt;/taxonRankValue&gt;
+        &lt;/taxonomicClassification&gt;
+
+        &lt;taxonomicClassification&gt;
+          &lt;taxonRankName&gt;Genus&lt;/taxonRankName&gt;
+          &lt;taxonRankValue&gt;Amblyomma sp.&lt;/taxonRankValue&gt;
+        &lt;/taxonomicClassification&gt;
+
+        &lt;taxonomicClassification&gt;
+          &lt;taxonRankName&gt;Genus&lt;/taxonRankName&gt;
+          &lt;taxonRankValue&gt;Borrelia sp.&lt;/taxonRankValue&gt;
+        &lt;/taxonomicClassification&gt;
+
+        &lt;taxonomicClassification&gt;
+          &lt;taxonRankName&gt;Species&lt;/taxonRankName&gt;
+          &lt;taxonRankValue&gt;Anaplasma phagocytophilum&lt;/taxonRankValue&gt;
+        &lt;/taxonomicClassification&gt;
+
+        &lt;taxonomicClassification&gt;
+          &lt;taxonRankName&gt;Genus&lt;/taxonRankName&gt;
+          &lt;taxonRankValue&gt;Ehrlichia sp.&lt;/taxonRankValue&gt;
+        &lt;/taxonomicClassification&gt;
+
+        &lt;taxonomicClassification&gt;
+          &lt;taxonRankName&gt;Species&lt;/taxonRankName&gt;
+          &lt;taxonRankValue&gt;Babesia microti&lt;/taxonRankValue&gt;
+        &lt;/taxonomicClassification&gt;
+
+        &lt;taxonomicClassification&gt;
+          &lt;taxonRankName&gt;Species&lt;/taxonRankName&gt;
+          &lt;taxonRankValue&gt;Francisella tularensis&lt;/taxonRankValue&gt;
+        &lt;/taxonomicClassification&gt;
+
+        &lt;taxonomicClassification&gt;
+          &lt;taxonRankName&gt;Species&lt;/taxonRankName&gt;
+          &lt;taxonRankValue&gt;Rickettsia rickettsii&lt;/taxonRankValue&gt;
+        &lt;/taxonomicClassification&gt;
+
+      &lt;/taxonomicCoverage&gt;
+
+    &lt;/coverage&gt;\n&#39;
+)
+
+project_block &lt;- paste0(
+&quot;    &lt;project&gt;
+
+      &lt;title&gt;National Ecological Observatory Network&lt;/title&gt;
+
+      &lt;personnel&gt;
+        &lt;individualName&gt;
+          &lt;givenName&gt;Kate&lt;/givenName&gt;
+          &lt;surName&gt;Thibault&lt;/surName&gt;
+        &lt;/individualName&gt;
+        &lt;userId directory=\&quot;http://orcid.org/\&quot;&gt;0000-0003-3477-6424&lt;/userId&gt;
+        &lt;role&gt;ADMINISTRATIVE_POINT_OF_CONTACT&lt;/role&gt;
+      &lt;/personnel&gt;
+
+      &lt;abstract&gt;
+        &lt;para&gt;
+          The National Science Foundation&#39;s National Ecological Observatory Network (NEON) is a continental-scale ecological observation facility, fully funded by NSF and operated by Battelle. NEON collects and provides open data from 81 field sites across the United States that characterize and quantify how our nation&#39;s ecosystems are changing. Each year, NEON collects and archives over 100,000 specimens and samples that complement the field observations and automated measurements collected at field sites. These samples represent a rich resource unique among natural history collections due to NEON&#39;s utility for continental- and decadal-scale ecology. NEON&#39;s archival samples are available upon request to support research studies and analyses. The comprehensive data, spatial extent and remote sensing technology provided by the NEON project will contribute to a better understanding and more accurate forecasting of how human activities impact ecology and how our society can more effectively address critical ecological questions and issues.
+        &lt;/para&gt;
+      &lt;/abstract&gt;
+
+      &lt;funding&gt;
+        &lt;para&gt;National Science Foundation, Award DBI-2217817&lt;/para&gt;
+      &lt;/funding&gt;
+
+      &lt;studyAreaDescription&gt;
+        &lt;descriptor name=\&quot;generic\&quot; citableClassificationSystem=\&quot;false\&quot;&gt;
+          &lt;descriptorValue&gt;United States including Alaska, Hawaii and Puerto Rico&lt;/descriptorValue&gt;
+        &lt;/descriptor&gt;
+      &lt;/studyAreaDescription&gt;
+
+    &lt;/project&gt;\n&quot;
+)
+
+additional_description_block &lt;- paste0(
+&#39;    &lt;purpose&gt;
+      &lt;para&gt;
+        This dataset was developed to illustrate how ecological monitoring data from the National Ecological Observatory Network (NEON) can be structured for publication to GBIF using the Darwin Core standard and the Humboldt Extension for Ecological Inventories. The workflow demonstrates how complex survey data can be organized into a Darwin Core Archive that supports reuse, integration, and ecological analysis.
+      &lt;/para&gt;
+    &lt;/purpose&gt;
+
+    &lt;introduction&gt;
+      &lt;para&gt;
+        This example has been created alongside the GBIF Guide for publishing biological survey and monitoring data to GBIF 
+        (&lt;ulink url=&quot;https://docs.gbif.org/guide-publishing-survey-data/en/&quot;&gt;&lt;citetitle&gt;GBIF survey data guide&lt;/citetitle&gt;&lt;/ulink&gt;) 
+        to illustrate how data from the National Ecological Observatory Network (NEON) can be expressed using Darwin Core and the Humboldt Extension for Ecological Inventories 
+        (&lt;ulink url=&quot;https://eco.tdwg.org/&quot;&gt;&lt;citetitle&gt;Humboldt Extension&lt;/citetitle&gt;&lt;/ulink&gt;).
+      &lt;/para&gt;
+
+      &lt;para&gt;
+        The workflow produces five Darwin Core tables: Event, HumboldtEcologicalInventory, Occurrence, ResourceRelationship, and ExtendedMeasurementOrFact. The dataset is structured hierarchically, with events defined at multiple levels (project, domain, site, plot, and plot visit). Occurrences represent collected ticks as well as subsequent laboratory results derived from them. Contextual information on sampling design, effort, and scope is expressed through Humboldt Extension terms.
+      &lt;/para&gt;
+
+      &lt;para&gt;
+        The U.S. National Science Foundation’s National Ecological Observatory Network (NEON) carries out long-term, standardized monitoring of tick populations and tick-borne pathogens across the United States. Sampling is conducted at terrestrial sites, where field staff survey designated plots every three to six weeks during the active tick season using drag and flag methods along the perimeter of 40 x 40 m plots. Ticks of all life stages are collected, preserved in ethanol, and later identified to species, life stage, and sex when possible.
+      &lt;/para&gt;
+
+      &lt;para&gt;
+        A subset of nymphal ticks is tested for pathogens of public health and veterinary concern, including Borrelia burgdorferi, Anaplasma phagocytophilum, Babesia microti, Ehrlichia species, and several Rickettsia species. Additional details on NEON’s tick monitoring program are available from the NEON tick data resource page 
+        (&lt;ulink url=&quot;https://www.neonscience.org/data-collection/ticks&quot;&gt;&lt;citetitle&gt;NEON tick data resource&lt;/citetitle&gt;&lt;/ulink&gt;) 
+        and associated protocols in the NEON Document Library 
+        (&lt;ulink url=&quot;https://data.neonscience.org/documents&quot;&gt;&lt;citetitle&gt;NEON Document Library&lt;/citetitle&gt;&lt;/ulink&gt;).
+      &lt;/para&gt;
+
+      &lt;para&gt;
+        NEON biological datasets are organized as hierarchical structures that reflect the standardized design of the survey program. Locality information is captured at multiple spatial scales, including domains, sites, and sampling units such as plots. Sampling context is described using the Darwin Core Event Core and Humboldt Extension, while additional measurements are recorded using the Extended Measurement or Fact (eMoF) extension. Occurrence records are linked to sampling events to represent collected organisms, and relationships among records are expressed using the ResourceRelationship extension.
+      &lt;/para&gt;
+    &lt;/introduction&gt;
+
+    &lt;gettingStarted&gt;
+      &lt;para&gt;
+        The dataset is provided as a Darwin Core Archive consisting of an Event Core file and associated extensions, including HumboldtEcologicalInventory, Occurrence, ResourceRelationship, MeasurementOrFact, and a Humboldt Extension table describing ecological inventory context. These components are linked through shared identifiers such as eventID and occurrenceID.
+      &lt;/para&gt;
+
+      &lt;para&gt;
+        Code used to transform the original NEON data into this Darwin Core Archive, including all data processing and mapping steps, is available at 
+        &lt;ulink url=&quot;https://sunray1.github.io/NEONTickstoHumboldt/&quot;&gt;&lt;citetitle&gt;NEON Ticks to Humboldt workflow&lt;/citetitle&gt;&lt;/ulink&gt;. 
+        This resource provides a reproducible workflow for constructing the archive and may be used as a reference for applying the Humboldt Extension to similar ecological datasets.
+      &lt;/para&gt;
+    &lt;/gettingStarted&gt;\n&#39;
+)
+
+dataset_block &lt;- paste0(
+  &#39;  &lt;dataset&gt;\n\n&#39;,
+  alternate_id_block,
+  &#39;    &lt;title xml:lang=&quot;eng&quot;&gt;&#39;, title, &#39;&lt;/title&gt;\n\n&#39;,
+  creator_block,
+  metadata_provider_block,
+  &#39;    &lt;pubDate&gt;&#39;, pub_date, &#39;&lt;/pubDate&gt;\n&#39;,
+  &#39;    &lt;language&gt;&#39;, language, &#39;&lt;/language&gt;\n\n&#39;,
+  abstract_block,
+  rights_block,
+  coverage_block,
+  additional_description_block,
+  maintenance_block,  
+  contact_block,
+  methods_block,
+  project_block,
+  &#39;  &lt;/dataset&gt;\n&#39;
+)
+
+date_stamp &lt;- format(Sys.time(), &quot;%Y-%m-%dT%H:%M:%SZ&quot;, tz = &quot;UTC&quot;)
+
+additional_metadata_block &lt;- paste0(
+&#39;  &lt;additionalMetadata&gt;
+    &lt;metadata&gt;
+      &lt;gbif&gt;
+        &lt;dateStamp&gt;&#39;, date_stamp, &#39;&lt;/dateStamp&gt;
+        &lt;hierarchyLevel&gt;dataset&lt;/hierarchyLevel&gt;
+        &lt;physical&gt;
+            &lt;objectName&gt;Ticks sampled using drag cloths&lt;/objectName&gt;
+            &lt;characterEncoding&gt;UTF-8&lt;/characterEncoding&gt;
+            &lt;dataFormat&gt;
+                &lt;externallyDefinedFormat&gt;
+                    &lt;formatName&gt;CSV&lt;/formatName&gt;
+                &lt;/externallyDefinedFormat&gt;
+            &lt;/dataFormat&gt;
+            &lt;distribution&gt;
+                &lt;online&gt;
+                    &lt;url function=&quot;download&quot;&gt;https://data.neonscience.org/data-products/DP1.10093.001&lt;/url&gt;
+                &lt;/online&gt;
+            &lt;/distribution&gt;
+        &lt;/physical&gt;
+        &lt;physical&gt;
+            &lt;objectName&gt;Tick pathogen status&lt;/objectName&gt;
+            &lt;characterEncoding&gt;UTF-8&lt;/characterEncoding&gt;
+            &lt;dataFormat&gt;
+                &lt;externallyDefinedFormat&gt;
+                    &lt;formatName&gt;CSV&lt;/formatName&gt;
+                &lt;/externallyDefinedFormat&gt;
+            &lt;/dataFormat&gt;
+            &lt;distribution&gt;
+                &lt;online&gt;
+                    &lt;url function=&quot;download&quot;&gt;https://data.neonscience.org/data-products/DP1.10092.001&lt;/url&gt;
+                &lt;/online&gt;
+            &lt;/distribution&gt;
+        &lt;/physical&gt;
+        &lt;physical&gt;
+            &lt;objectName&gt;Tick Collection (Vouchers)&lt;/objectName&gt;
+            &lt;characterEncoding&gt;UTF-8&lt;/characterEncoding&gt;
+            &lt;dataFormat&gt;
+                &lt;externallyDefinedFormat&gt;
+                    &lt;formatName&gt;CSV&lt;/formatName&gt;
+                &lt;/externallyDefinedFormat&gt;
+            &lt;/dataFormat&gt;
+            &lt;distribution&gt;
+                &lt;online&gt;
+                    &lt;url function=&quot;download&quot;&gt;https://biorepo.neonscience.org/portal/collections/misc/neoncollprofiles.php?collid=116&lt;/url&gt;
+                &lt;/online&gt;
+            &lt;/distribution&gt;
+        &lt;/physical&gt;
+        &lt;physical&gt;
+            &lt;objectName&gt;Tick Collection (Pathogen Extract)&lt;/objectName&gt;
+            &lt;characterEncoding&gt;UTF-8&lt;/characterEncoding&gt;
+            &lt;dataFormat&gt;
+                &lt;externallyDefinedFormat&gt;
+                    &lt;formatName&gt;CSV&lt;/formatName&gt;
+                &lt;/externallyDefinedFormat&gt;
+            &lt;/dataFormat&gt;
+            &lt;distribution&gt;
+                &lt;online&gt;
+                    &lt;url function=&quot;download&quot;&gt;https://biorepo.neonscience.org/portal/collections/misc/neoncollprofiles.php?collid=75&lt;/url&gt;
+                &lt;/online&gt;
+            &lt;/distribution&gt;
+        &lt;/physical&gt;
+        &lt;physical&gt;
+            &lt;objectName&gt;U.S. National Tick Collection at Georgia Southern University&lt;/objectName&gt;
+            &lt;characterEncoding&gt;UTF-8&lt;/characterEncoding&gt;
+            &lt;dataFormat&gt;
+                &lt;externallyDefinedFormat&gt;
+                    &lt;formatName&gt;CSV&lt;/formatName&gt;
+                &lt;/externallyDefinedFormat&gt;
+            &lt;/dataFormat&gt;
+            &lt;distribution&gt;
+                &lt;online&gt;
+                    &lt;url function=&quot;download&quot;&gt;https://biorepo.neonscience.org/portal/collections/misc/neoncollprofiles.php?collid=83&lt;/url&gt;
+                &lt;/online&gt;
+            &lt;/distribution&gt;
+        &lt;/physical&gt;
+        &lt;collection&gt;
+          &lt;collectionIdentifier&gt;https://www.georgiasouthern.edu/research/centers/us-national-tick-collection&lt;/collectionIdentifier&gt;
+          &lt;collectionName&gt;U.S. National Tick Collection at Georgia Southern University&lt;/collectionName&gt;
+        &lt;/collection&gt;
+
+        &lt;collection&gt;
+          &lt;collectionIdentifier&gt;https://biorepo.neonscience.org/portal/collections/misc/neoncollprofiles.php?collid=83&lt;/collectionIdentifier&gt;
+          &lt;collectionName&gt;U.S. National Tick Collection at Georgia Southern University&lt;/collectionName&gt;
+        &lt;/collection&gt;
+
+        &lt;collection&gt;
+          &lt;collectionIdentifier&gt;https://biorepo.neonscience.org/portal/collections/misc/collprofiles.php?collid=116&lt;/collectionIdentifier&gt;
+          &lt;collectionName&gt;NEON Biorepository Tick Collection (Vouchers)&lt;/collectionName&gt;
+        &lt;/collection&gt;
+        
+        &lt;collection&gt;
+          &lt;collectionIdentifier&gt;https://biorepo.neonscience.org/portal/collections/misc/collprofiles.php?collid=75&lt;/collectionIdentifier&gt;
+          &lt;collectionName&gt;NEON Biorepository Tick Collection (Pathogen Extracts)&lt;/collectionName&gt;
+        &lt;/collection&gt;
+
+      &lt;/gbif&gt;
+    &lt;/metadata&gt;
+  &lt;/additionalMetadata&gt;\n&#39;
+)
+
+header_block &lt;- paste0(
+&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;eml:eml xmlns:eml=&quot;https://eml.ecoinformatics.org/eml-2.2.0&quot;
+         xmlns:dc=&quot;http://purl.org/dc/terms/&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;https://eml.ecoinformatics.org/eml-2.2.0 https://rs.gbif.org/schema/eml-gbif-profile/1.3/eml.xsd&quot;
+         packageId=&quot;&#39;, package_id, &#39;&quot; system=&quot;http://gbif.org&quot; scope=&quot;system&quot;
+         xml:lang=&quot;eng&quot;&gt;\n\n&#39;
+)
+
+footer_block &lt;- &#39;&lt;/eml:eml&gt;&#39;
+
+eml_xml &lt;- paste0(
+  header_block,
+  dataset_block,
+  additional_metadata_block,
+  footer_block
+)
+
+writeLines(eml_xml, &quot;outputs/zipped/eml.xml&quot;)</code></pre>
+<p>Zip files to a DwC-A:</p>
+<pre class="r"><code>output_zip &lt;- &quot;outputs/zipped/DwC-A.zip&quot;
+
+if (file.exists(output_zip)) {
+  unlink(output_zip)
+}
+
+file_paths &lt;- list.files(&quot;outputs/zipped&quot;, full.names = TRUE)
+zip(zipfile = output_zip, files = file_paths, flags = &quot;-j&quot; )
+
+if (file.exists(output_zip)) {
+  unlink(file_paths)
+}</code></pre>
+</div>
 </div>
 
 
