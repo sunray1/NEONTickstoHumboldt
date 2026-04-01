@@ -11,7 +11,7 @@
 
 <meta name="author" content="Chandra Earl, Kate Ingenloff" />
 
-<meta name="date" content="2026-03-31" />
+<meta name="date" content="2026-04-01" />
 
 <title>Mapping NEON Survey Monitoring Data to the Humboldt Extension for Ecological Inventories</title>
 
@@ -1504,7 +1504,7 @@ Humboldt Extension for Ecological Inventories</h1>
 <h3 class="subtitle"><a href="https://docs.gbif.org/guide-publishing-survey-data/en/">Guide for
 publishing biological survey and monitoring data to GBIF</a></h3>
 <h4 class="author">Chandra Earl, Kate Ingenloff</h4>
-<h4 class="date">2026-03-31</h4>
+<h4 class="date">2026-04-01</h4>
 
 </div>
 
@@ -3344,18 +3344,16 @@ project_block &lt;- paste0(
 additional_description_block &lt;- paste0(
 &#39;    &lt;purpose&gt;
       &lt;para&gt;
-        This dataset was developed to illustrate how ecological monitoring data from the National Ecological Observatory Network (NEON) can be structured for publication to GBIF using the Darwin Core standard and the Humboldt Extension for Ecological Inventories. The workflow demonstrates how complex survey data can be organized into a Darwin Core Archive that supports reuse, integration, and ecological analysis.
+        This dataset was developed alongside the GBIF Guide for publishing biological survey and monitoring data to GBIF 
+        (&lt;ulink url=&quot;https://docs.gbif.org/guide-publishing-survey-data/en/&quot;&gt;&lt;citetitle&gt;GBIF survey data guide&lt;/citetitle&gt;&lt;/ulink&gt;) 
+        to illustrate how ecological monitoring data from the National Ecological Observatory Network (NEON) can be structured for publication using the Darwin Core standard and the Humboldt Extension for Ecological Inventories 
+        (&lt;ulink url=&quot;https://eco.tdwg.org/&quot;&gt;&lt;citetitle&gt;Humboldt Extension&lt;/citetitle&gt;&lt;/ulink&gt;). 
+        The workflow demonstrates how complex survey data can be organized into a Darwin Core Archive that supports reuse, integration, and ecological analysis. Code used to transform the original NEON data into this Darwin Core Archive, including all data processing and mapping steps, is available at 
+        &lt;ulink url=&quot;https://sunray1.github.io/NEONTickstoHumboldt/&quot;&gt;&lt;citetitle&gt;NEON Ticks to Humboldt workflow&lt;/citetitle&gt;&lt;/ulink&gt;.
       &lt;/para&gt;
     &lt;/purpose&gt;
 
     &lt;introduction&gt;
-      &lt;para&gt;
-        This example has been created alongside the GBIF Guide for publishing biological survey and monitoring data to GBIF 
-        (&lt;ulink url=&quot;https://docs.gbif.org/guide-publishing-survey-data/en/&quot;&gt;&lt;citetitle&gt;GBIF survey data guide&lt;/citetitle&gt;&lt;/ulink&gt;) 
-        to illustrate how data from the National Ecological Observatory Network (NEON) can be expressed using Darwin Core and the Humboldt Extension for Ecological Inventories 
-        (&lt;ulink url=&quot;https://eco.tdwg.org/&quot;&gt;&lt;citetitle&gt;Humboldt Extension&lt;/citetitle&gt;&lt;/ulink&gt;).
-      &lt;/para&gt;
-
       &lt;para&gt;
         The workflow produces five Darwin Core tables: Event, HumboldtEcologicalInventory, Occurrence, ResourceRelationship, and ExtendedMeasurementOrFact. The dataset is structured hierarchically, with events defined at multiple levels (project, domain, site, plot, and plot visit). Occurrences represent collected ticks as well as subsequent laboratory results derived from them. Contextual information on sampling design, effort, and scope is expressed through Humboldt Extension terms.
       &lt;/para&gt;
@@ -3379,12 +3377,6 @@ additional_description_block &lt;- paste0(
     &lt;gettingStarted&gt;
       &lt;para&gt;
         The dataset is provided as a Darwin Core Archive consisting of an Event Core file and associated extensions, including HumboldtEcologicalInventory, Occurrence, ResourceRelationship, MeasurementOrFact, and a Humboldt Extension table describing ecological inventory context. These components are linked through shared identifiers such as eventID and occurrenceID.
-      &lt;/para&gt;
-
-      &lt;para&gt;
-        Code used to transform the original NEON data into this Darwin Core Archive, including all data processing and mapping steps, is available at 
-        &lt;ulink url=&quot;https://sunray1.github.io/NEONTickstoHumboldt/&quot;&gt;&lt;citetitle&gt;NEON Ticks to Humboldt workflow&lt;/citetitle&gt;&lt;/ulink&gt;. 
-        This resource provides a reproducible workflow for constructing the archive and may be used as a reference for applying the Humboldt Extension to similar ecological datasets.
       &lt;/para&gt;
     &lt;/gettingStarted&gt;\n&#39;
 )
