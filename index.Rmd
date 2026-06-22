@@ -1374,6 +1374,35 @@ rownames(emof_data) <- NULL
 emof_data <- emof_data %>% select(where(~ !all(is.na(.)))) #Remove columns that are entirely NA
 ```
 
+## Remove Duplicate Events
+
+Some event records are incorrectly entered twice in the raw data. We remove those here, along with associated records.
+
+```{r}
+duplicate_events <- unique(
+  event_data_core$eventID[duplicated(event_data_core$eventID)]
+)
+
+event_data_core <- event_data_core %>%
+  filter(!eventID %in% duplicate_events)
+
+event_data_humboldt <- event_data_humboldt %>%
+  filter(!eventID %in% duplicate_events)
+
+dup_occurrence_ids <- occurrence_data %>%
+  filter(eventID %in% duplicate_events) %>%
+  pull(occurrenceID)
+
+resource_relationship_data <- resource_relationship_data %>%
+  filter(!relatedResourceID %in% dup_occurrence_ids)
+
+occurrence_data <- occurrence_data %>%
+  filter(!eventID %in% duplicate_events)
+
+emof_data <- emof_data %>%
+  filter(!eventID %in% duplicate_events)
+```
+
 # Save Data
 
 ## Full Dataset
@@ -1498,7 +1527,7 @@ make_fields_xml(occurrence_data, "http://rs.tdwg.org/dwc/terms/"),
 rr_xml <- paste0(
 '<extension encoding="UTF-8" fieldsTerminatedBy="," linesTerminatedBy="\\n" 
            fieldsEnclosedBy="&quot;" ignoreHeaderLines="1"
-           rowType="http://rs.tdwg.org/terms/1.0/ResourceRelationship">
+           rowType="http://rs.tdwg.org/dwc/terms/ResourceRelationship">
 
   <files>
     <location>resourceRelationship.csv</location>
