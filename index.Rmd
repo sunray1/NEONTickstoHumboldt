@@ -1472,8 +1472,8 @@ Create meta.xml files (the file describing the structure of the data):
 # function to create fields
 make_fields_xml <- function(df, prefix) {
   paste0(
-    '    <field index="', seq_along(colnames(df))[-1] - 1,
-    '" term="', paste0(prefix, colnames(df)[-1]), '"/>',
+    '    <field index="', seq_along(colnames(df)) - 1,
+    '" term="', paste0(prefix, colnames(df)), '"/>',
     collapse = "\n"
   )
 }

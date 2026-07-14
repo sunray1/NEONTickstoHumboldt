@@ -11,7 +11,7 @@
 
 <meta name="author" content="Chandra Earl, Kate Ingenloff" />
 
-<meta name="date" content="2026-06-22" />
+<meta name="date" content="2026-07-14" />
 
 <title>Mapping NEON Survey Monitoring Data to the Humboldt Extension for Ecological Inventories</title>
 
@@ -1504,7 +1504,7 @@ Humboldt Extension for Ecological Inventories</h1>
 <h3 class="subtitle"><a href="https://docs.gbif.org/guide-publishing-survey-data/en/">Guide for
 publishing biological survey and monitoring data to GBIF</a></h3>
 <h4 class="author">Chandra Earl, Kate Ingenloff</h4>
-<h4 class="date">2026-06-22</h4>
+<h4 class="date">2026-07-14</h4>
 
 </div>
 
@@ -3000,8 +3000,8 @@ data):</p>
 <pre class="r"><code># function to create fields
 make_fields_xml &lt;- function(df, prefix) {
   paste0(
-    &#39;    &lt;field index=&quot;&#39;, seq_along(colnames(df))[-1] - 1,
-    &#39;&quot; term=&quot;&#39;, paste0(prefix, colnames(df)[-1]), &#39;&quot;/&gt;&#39;,
+    &#39;    &lt;field index=&quot;&#39;, seq_along(colnames(df)) - 1,
+    &#39;&quot; term=&quot;&#39;, paste0(prefix, colnames(df)), &#39;&quot;/&gt;&#39;,
     collapse = &quot;\n&quot;
   )
 }
