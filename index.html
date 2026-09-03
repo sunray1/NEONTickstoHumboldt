@@ -11,7 +11,7 @@
 
 <meta name="author" content="Chandra Earl, Kate Ingenloff" />
 
-<meta name="date" content="2026-08-26" />
+<meta name="date" content="2026-09-03" />
 
 <title>Mapping NEON Survey Monitoring Data to the Humboldt Extension for Ecological Inventories</title>
 
@@ -1504,7 +1504,7 @@ Humboldt Extension for Ecological Inventories</h1>
 <h3 class="subtitle"><a href="https://docs.gbif.org/guide-publishing-survey-data/en/">Guide for
 publishing biological survey and monitoring data to GBIF</a></h3>
 <h4 class="author">Chandra Earl, Kate Ingenloff</h4>
-<h4 class="date">2026-08-26</h4>
+<h4 class="date">2026-09-03</h4>
 
 </div>
 
@@ -1596,7 +1596,7 @@ Library</a>.</p>
 <div id="introduction-to-neons-hierarchical-dataset-structure" class="section level2 hasAnchor">
 <h2 class="hasAnchor">Introduction to NEON’s Hierarchical Dataset
 Structure<a href="#introduction-to-neons-hierarchical-dataset-structure" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><img src="data:text/html; charset=utf-8;charset=utf-8,%3C%21DOCTYPE%20html%3E%0A%3Chtml%3E%0A%20%20%3Chead%3E%0A%20%20%20%20%3Ctitle%3E403%20Forbidden%3C%2Ftitle%3E%0A%20%20%3C%2Fhead%3E%0A%20%20%3Cbody%3E%0A%20%20%20%20%3Ch1%3EError%20403%20Forbidden%3C%2Fh1%3E%0A%20%20%20%20%3Cp%3EForbidden%3C%2Fp%3E%0A%20%20%20%20%3Ch3%3EGuru%20Meditation%3A%3C%2Fh3%3E%0A%20%20%20%20%3Cp%3EXID%3A%20903413860%3C%2Fp%3E%0A%20%20%20%20%3Chr%3E%0A%20%20%20%20%3Cp%3EVarnish%20Cache%20server%3C%2Fp%3E%0A%20%20%3C%2Fbody%3E%0A%3C%2Fhtml%3E%0A" style="width:100.0%" /></p>
+<p><img src="data:text/html; charset=utf-8;charset=utf-8,%3C%21DOCTYPE%20html%3E%0A%3Chtml%3E%0A%20%20%3Chead%3E%0A%20%20%20%20%3Ctitle%3E403%20Forbidden%3C%2Ftitle%3E%0A%20%20%3C%2Fhead%3E%0A%20%20%3Cbody%3E%0A%20%20%20%20%3Ch1%3EError%20403%20Forbidden%3C%2Fh1%3E%0A%20%20%20%20%3Cp%3EForbidden%3C%2Fp%3E%0A%20%20%20%20%3Ch3%3EGuru%20Meditation%3A%3C%2Fh3%3E%0A%20%20%20%20%3Cp%3EXID%3A%2022501015%3C%2Fp%3E%0A%20%20%20%20%3Chr%3E%0A%20%20%20%20%3Cp%3EVarnish%20Cache%20server%3C%2Fp%3E%0A%20%20%3C%2Fbody%3E%0A%3C%2Fhtml%3E%0A" style="width:100.0%" /></p>
 <p>NEON biological datasets are organized as deeply nested structures
 that reflect the standardized design of the survey program <a href="https://doi.org/10.1002/ecs2.1627">Thorpe et al. 2016</a>. At the
 highest level is the project, which defines the scope of the
@@ -2599,6 +2599,8 @@ identified and tested at the Laboratory of Medical Zoology (LMZ) at the
 University of Massachusetts Amherst and archived at the NEON
 Biorepository at Arizona State University.</p>
 <pre class="r"><code>NEON_tick_occurrence_data &lt;- tick.occurrence$tck_taxonomyProcessed
+NEON_tick_occurrence_data &lt;- NEON_tick_occurrence_data %&gt;%
+  dplyr::filter(!is.na(scientificName))
 NEON_tick_catalognumbers  &lt;- catalognumbers.ticks
 
 added_tick_occurrence_data &lt;- data.frame(eventID = NEON_tick_occurrence_data$sampleID,
@@ -2666,12 +2668,12 @@ record includes details of the test method, result, and pathogen name,
 and is linked back to the originating tick specimen through the Darwin
 Core Resource Relationship extension.</p>
 <pre class="r"><code>NEON_pathogen_occurrence_data &lt;- tick.pathogen$tck_pathogen %&gt;%
-  filter(
-    !is.na(testResult) &amp;
-    !is.na(testPathogenName) &amp;
-      testPathogenName != &quot;HardTick DNA Quality&quot; &amp; #Remove DNA Quality test
-      !grepl(&quot;^(Ixodes|Dermacentor|Amblyomma|Haemaphysalis)&quot;, testPathogenName) #Remove molecular identification tests
-  )
+  filter(!is.na(testResult) &amp; !is.na(testPathogenName) &amp;
+         testPathogenName != &quot;HardTick DNA Quality&quot; &amp; #Remove DNA Quality test
+         !grepl(&quot;^(Ixodes|Dermacentor|Amblyomma|Haemaphysalis)&quot;, testPathogenName)) %&gt;% #Remove molecular identification tests
+  mutate(testPathogenName = recode(testPathogenName,
+                                   &quot;Ehrlichia muris-like&quot; = &quot;Ehrlichia muris eauclairensis&quot;,
+                                   &quot;Borrelia sp.&quot; = &quot;Borrelia&quot;))
 NEON_pathogens_catalognumbers  &lt;- catalognumbers.pathogens
 
 
@@ -2681,7 +2683,23 @@ added_pathogen_occurrence_data &lt;- data.frame(eventID = sapply(strsplit(NEON_p
                                              basisOfRecord = &quot;MaterialSample&quot;,
                                              catalogNumber = NEON_pathogens_catalognumbers[NEON_pathogen_occurrence_data$testingID],
                                              scientificName = NEON_pathogen_occurrence_data$testPathogenName,
-                                             taxonRank = NA,
+                                             taxonRank = c(
+                                               &quot;Borrelia burgdorferi&quot; = &quot;species&quot;,
+                                               &quot;Borrelia miyamotoi&quot; = &quot;species&quot;,
+                                               &quot;Anaplasma phagocytophilum&quot; = &quot;species&quot;,
+                                               &quot;Rickettsia rickettsii&quot; = &quot;species&quot;,
+                                               &quot;Ehrlichia chaffeensis&quot; = &quot;species&quot;,
+                                               &quot;Borrelia lonestari&quot; = &quot;species&quot;,
+                                               &quot;Babesia microti&quot; = &quot;species&quot;,
+                                               &quot;Ehrlichia ewingii&quot; = &quot;species&quot;,
+                                               &quot;Borrelia burgdorferi sensu lato&quot; = &quot;complex/group&quot;,
+                                               &quot;Ehrlichia muris eauclairensis&quot; = &quot;subspecies&quot;,
+                                               &quot;Borrelia mayonii&quot; = &quot;species&quot;,
+                                               &quot;Francisella tularensis&quot; = &quot;species&quot;,
+                                               &quot;Borrelia&quot; = &quot;genus&quot;,
+                                               &quot;Rickettsia parkeri&quot; = &quot;species&quot;,
+                                               &quot;Rickettsia philipii&quot; = &quot;species&quot;
+                                            )[NEON_pathogen_occurrence_data$testPathogenName],
                                              kingdom = c(&quot;Borrelia burgdorferi&quot; = &quot;Bacteria&quot;,
                                                          &quot;Borrelia miyamotoi&quot; = &quot;Bacteria&quot;,
                                                          &quot;Anaplasma phagocytophilum&quot; = &quot;Bacteria&quot;,
@@ -2691,10 +2709,10 @@ added_pathogen_occurrence_data &lt;- data.frame(eventID = sapply(strsplit(NEON_p
                                                          &quot;Babesia microti&quot; = &quot;Protista&quot;,
                                                          &quot;Ehrlichia ewingii&quot; = &quot;Bacteria&quot;,
                                                          &quot;Borrelia burgdorferi sensu lato&quot; = &quot;Bacteria&quot;,
-                                                         &quot;Ehrlichia muris-like&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Ehrlichia muris eauclairensis&quot; = &quot;Bacteria&quot;,
                                                          &quot;Borrelia mayonii&quot; = &quot;Bacteria&quot;,
                                                          &quot;Francisella tularensis&quot; = &quot;Bacteria&quot;,
-                                                         &quot;Borrelia sp.&quot; = &quot;Bacteria&quot;,
+                                                         &quot;Borrelia&quot; = &quot;Bacteria&quot;,
                                                          &quot;Rickettsia parkeri&quot; = &quot;Bacteria&quot;,
                                                          &quot;Rickettsia philipii&quot; = &quot;Bacteria&quot;
                                                          )[NEON_pathogen_occurrence_data$testPathogenName],
@@ -2714,10 +2732,10 @@ added_pathogen_occurrence_data &lt;- data.frame(eventID = sapply(strsplit(NEON_p
                                                                 &quot;Babesia microti&quot; = &quot;Babesiosis parasite&quot;,
                                                                 &quot;Ehrlichia ewingii&quot;  = &quot;Human ehrlichiosis agent&quot;,
                                                                 &quot;Borrelia burgdorferi sensu lato&quot; = &quot;Lyme disease agent&quot;,
-                                                                &quot;Ehrlichia muris-like&quot; = &quot;Human ehrlichiosis agent&quot;,
+                                                                &quot;Ehrlichia muris eauclairensis&quot; = &quot;Human ehrlichiosis agent&quot;,
                                                                 &quot;Borrelia mayonii&quot; = &quot;Lyme disease agent&quot;,
                                                                 &quot;Francisella tularensis&quot; = &quot;Tularemia agent&quot;,
-                                                                &quot;Borrelia sp.&quot; = &quot;Lyme disease or relapsing fever agent&quot;,
+                                                                &quot;Borrelia&quot; = &quot;Lyme disease or relapsing fever agent&quot;,
                                                                 &quot;Rickettsia parkeri&quot; = &quot;Rickettsia parkeri rickettsiosis agent&quot;,
                                                                 &quot;Rickettsia philipii&quot; = &quot;Pacific coast tick fever agent&quot;
                                                                )[NEON_pathogen_occurrence_data$testPathogenName],

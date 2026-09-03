@@ -1040,6 +1040,8 @@ Tick occurrence records correspond to individual specimens collected in the fiel
 
 ```{r}
 NEON_tick_occurrence_data <- tick.occurrence$tck_taxonomyProcessed
+NEON_tick_occurrence_data <- NEON_tick_occurrence_data %>%
+  dplyr::filter(!is.na(scientificName))
 NEON_tick_catalognumbers  <- catalognumbers.ticks
 
 added_tick_occurrence_data <- data.frame(eventID = NEON_tick_occurrence_data$sampleID,
@@ -1106,12 +1108,12 @@ A subset of collected ticks are subsequently tested for pathogens. The results o
 
 ```{r}
 NEON_pathogen_occurrence_data <- tick.pathogen$tck_pathogen %>%
-  filter(
-    !is.na(testResult) &
-    !is.na(testPathogenName) &
-      testPathogenName != "HardTick DNA Quality" & #Remove DNA Quality test
-      !grepl("^(Ixodes|Dermacentor|Amblyomma|Haemaphysalis)", testPathogenName) #Remove molecular identification tests
-  )
+  filter(!is.na(testResult) & !is.na(testPathogenName) &
+         testPathogenName != "HardTick DNA Quality" & #Remove DNA Quality test
+         !grepl("^(Ixodes|Dermacentor|Amblyomma|Haemaphysalis)", testPathogenName)) %>% #Remove molecular identification tests
+  mutate(testPathogenName = recode(testPathogenName,
+                                   "Ehrlichia muris-like" = "Ehrlichia muris eauclairensis",
+                                   "Borrelia sp." = "Borrelia"))
 NEON_pathogens_catalognumbers  <- catalognumbers.pathogens
 
 
@@ -1121,7 +1123,23 @@ added_pathogen_occurrence_data <- data.frame(eventID = sapply(strsplit(NEON_path
                                              basisOfRecord = "MaterialSample",
                                              catalogNumber = NEON_pathogens_catalognumbers[NEON_pathogen_occurrence_data$testingID],
                                              scientificName = NEON_pathogen_occurrence_data$testPathogenName,
-                                             taxonRank = NA,
+                                             taxonRank = c(
+                                               "Borrelia burgdorferi" = "species",
+                                               "Borrelia miyamotoi" = "species",
+                                               "Anaplasma phagocytophilum" = "species",
+                                               "Rickettsia rickettsii" = "species",
+                                               "Ehrlichia chaffeensis" = "species",
+                                               "Borrelia lonestari" = "species",
+                                               "Babesia microti" = "species",
+                                               "Ehrlichia ewingii" = "species",
+                                               "Borrelia burgdorferi sensu lato" = "complex/group",
+                                               "Ehrlichia muris eauclairensis" = "subspecies",
+                                               "Borrelia mayonii" = "species",
+                                               "Francisella tularensis" = "species",
+                                               "Borrelia" = "genus",
+                                               "Rickettsia parkeri" = "species",
+                                               "Rickettsia philipii" = "species"
+                                            )[NEON_pathogen_occurrence_data$testPathogenName],
                                              kingdom = c("Borrelia burgdorferi" = "Bacteria",
                                                          "Borrelia miyamotoi" = "Bacteria",
                                                          "Anaplasma phagocytophilum" = "Bacteria",
@@ -1131,10 +1149,10 @@ added_pathogen_occurrence_data <- data.frame(eventID = sapply(strsplit(NEON_path
                                                          "Babesia microti" = "Protista",
                                                          "Ehrlichia ewingii" = "Bacteria",
                                                          "Borrelia burgdorferi sensu lato" = "Bacteria",
-                                                         "Ehrlichia muris-like" = "Bacteria",
+                                                         "Ehrlichia muris eauclairensis" = "Bacteria",
                                                          "Borrelia mayonii" = "Bacteria",
                                                          "Francisella tularensis" = "Bacteria",
-                                                         "Borrelia sp." = "Bacteria",
+                                                         "Borrelia" = "Bacteria",
                                                          "Rickettsia parkeri" = "Bacteria",
                                                          "Rickettsia philipii" = "Bacteria"
                                                          )[NEON_pathogen_occurrence_data$testPathogenName],
@@ -1154,10 +1172,10 @@ added_pathogen_occurrence_data <- data.frame(eventID = sapply(strsplit(NEON_path
                                                                 "Babesia microti" = "Babesiosis parasite",
                                                                 "Ehrlichia ewingii"  = "Human ehrlichiosis agent",
                                                                 "Borrelia burgdorferi sensu lato" = "Lyme disease agent",
-                                                                "Ehrlichia muris-like" = "Human ehrlichiosis agent",
+                                                                "Ehrlichia muris eauclairensis" = "Human ehrlichiosis agent",
                                                                 "Borrelia mayonii" = "Lyme disease agent",
                                                                 "Francisella tularensis" = "Tularemia agent",
-                                                                "Borrelia sp." = "Lyme disease or relapsing fever agent",
+                                                                "Borrelia" = "Lyme disease or relapsing fever agent",
                                                                 "Rickettsia parkeri" = "Rickettsia parkeri rickettsiosis agent",
                                                                 "Rickettsia philipii" = "Pacific coast tick fever agent"
                                                                )[NEON_pathogen_occurrence_data$testPathogenName],
